@@ -6,10 +6,17 @@ import DeletedNotice from "@/components/DeletedNotice";
 import { prisma } from "@/lib/prisma";
 import { serializePublicOpportunity } from "@/lib/serializeOpportunity";
 import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
+import { fill, getDictionary } from "@/lib/i18n/dictionaries";
+
+export async function generateMetadata({ params }) {
+  const { lang } = await params;
+  return { title: getDictionary(lang).meta.titles.opportunities };
+}
 
 // Reads the opportunities and renders the list, or an empty or error message.
 // With Cache Components enabled, an uncached database read must sit inside <Suspense> (see the page below).
-async function OpportunityList() {
+async function OpportunityList({ lang }) {
+  const t = getDictionary(lang).opportunities;
   let opportunities;
   try {
     const rows = await prisma.opportunity.findMany({
@@ -22,13 +29,13 @@ async function OpportunityList() {
     console.error("Homepage could not load opportunities:", error?.name, error?.code);
     return (
       <p className="state-message state-error" role="alert">
-        We couldn&rsquo;t load opportunities right now. Please try again in a moment.
+        {t.loadError}
       </p>
     );
   }
 
   if (opportunities.length === 0) {
-    return <p className="state-message">No opportunities have been added yet. Please check back soon.</p>;
+    return <p className="state-message">{t.empty}</p>;
   }
 
   const today = new Date().toISOString().slice(0, 10); // today's date in UTC, "YYYY-MM-DD"
@@ -37,12 +44,12 @@ async function OpportunityList() {
   return (
     <>
       <p className="result-count">
-        {count} {count === 1 ? "opportunity" : "opportunities"} found
+        {fill(count === 1 ? t.countOne : t.countMany, { count })}
       </p>
       <ul className="opportunity-list">
         {opportunities.map((opportunity) => (
           <li key={opportunity.id}>
-            <OpportunityCard opportunity={opportunity} today={today} />
+            <OpportunityCard opportunity={opportunity} today={today} lang={lang} />
           </li>
         ))}
       </ul>
@@ -50,17 +57,19 @@ async function OpportunityList() {
   );
 }
 
-export default function Home() {
+export default async function OpportunitiesPage({ params }) {
+  const { lang } = await params;
+  const t = getDictionary(lang).opportunities;
   return (
     <>
       <main id="main-content" tabIndex={-1} className="page-main">
         <div className="page-title-row">
-          <h1>Opportunities</h1>
+          <h1>{t.heading}</h1>
         </div>
-        <p className="page-intro">Explore jobs, internships, fellowships, volunteer roles, workshops, events, and resources.</p>
+        <p className="page-intro">{t.intro}</p>
         <DeletedNotice />
-        <Suspense fallback={<p className="state-message">Loading opportunities&hellip;</p>}>
-          <OpportunityList />
+        <Suspense fallback={<p className="state-message">{t.loading}</p>}>
+          <OpportunityList lang={lang} />
         </Suspense>
       </main>
     </>

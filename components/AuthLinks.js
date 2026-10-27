@@ -2,8 +2,10 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth/server";
 import { localePath } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export default async function AuthLinks({ lang = "en" }) {
+  const t = getDictionary(lang);
   let user = null;
   try {
     const { data: session } = await auth.getSession();
@@ -15,10 +17,10 @@ export default async function AuthLinks({ lang = "en" }) {
   if (!user) {
     return (
       <>
-        <Link href={localePath(lang, "/auth/sign-in")}>Sign in</Link>
-        <Link href={localePath(lang, "/auth/sign-up")}>Create account</Link>
+        <Link href={localePath(lang, "/auth/sign-in")}>{t.nav.signIn}</Link>
+        <Link href={localePath(lang, "/auth/sign-up")}>{t.nav.createAccount}</Link>
       </>
     );
   }
-  return <Link href={localePath(lang, "/account")}>Account</Link>;
+  return <Link href={localePath(lang, "/account")}>{t.nav.account}</Link>;
 }

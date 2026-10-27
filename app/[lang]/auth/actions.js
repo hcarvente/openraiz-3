@@ -9,15 +9,20 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/roles";
 import { validateProfileChoice, validateSignUp } from "@/lib/rolesCore";
 import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { safeNextPath } from "@/lib/safeRedirect";
 
 const text = (formData, name) => (typeof formData.get(name) === "string" ? formData.get(name) : "");
 // The forms send their language in a hidden field; anything else means English.
 const langOf = (formData) => (isLocale(text(formData, "lang")) ? text(formData, "lang") : DEFAULT_LOCALE);
-const UNAVAILABLE = "Sign-in is unavailable right now. Please try again in a moment.";
+// The messages in the visitor's language (see lib/i18n/dictionaries, auth.errors).
+const messagesFor = (lang) => getDictionary(lang).auth.errors;
+// Turns the validators' message keys ({ email: "emailInvalid" }) into text.
+const translateErrors = (errors, messages) => Object.fromEntries(Object.entries(errors).map(([field, key]) => [field, messages[key] ?? key]));
 
 export async function signUpAction(_previous, formData) {
   const lang = langOf(formData);
+  const messages = messagesFor(lang);
   const raw = {
     name: text(formData, "name"),
     email: text(formData, "email"),
@@ -28,19 +33,19 @@ export async function signUpAction(_previous, formData) {
   const values = { name: raw.name, email: raw.email, role: raw.role, orgName: raw.orgName }; // never the password
 
   const result = validateSignUp(raw);
-  if (!result.ok) return { errors: result.errors, values };
+  if (!result.ok) return { errors: translateErrors(result.errors, messages), values };
   const { name, email, password, role, orgName } = result.values;
 
   let userId;
   try {
     const { data, error } = await auth.signUp.email({ name, email, password });
     if (error || !data?.user?.id) {
-      return { message: "We couldn't create the account. If you already have one, sign in instead.", values };
+      return { message: messages.createFailed, values };
     }
     userId = data.user.id;
   } catch (error) {
     console.error("Sign-up failed:", error?.name, error?.code);
-    return { message: UNAVAILABLE, values };
+    return { message: messages.unavailable, values };
   }
 
   // The account exists now. If saving the profile fails, the person can finish it on /account after signing in.
@@ -55,52 +60,55 @@ export async function signUpAction(_previous, formData) {
 
 export async function verifyAction(_previous, formData) {
   const lang = langOf(formData);
+  const messages = messagesFor(lang);
   const email = text(formData, "email").trim().toLowerCase();
   const otp = text(formData, "otp").trim();
   if (!email || !/^[A-Za-z0-9]{4,12}$/.test(otp)) {
-    return { message: "Enter the email address and the code from your email.", values: { email } };
+    return { message: messages.enterEmailCode, values: { email } };
   }
 
   try {
     const { error } = await auth.emailOtp.verifyEmail({ email, otp });
-    if (error) return { message: "That code is wrong or has expired. Ask for a new one.", values: { email } };
+    if (error) return { message: messages.codeWrong, values: { email } };
   } catch (error) {
     console.error("Verification failed:", error?.name, error?.code);
-    return { message: UNAVAILABLE, values: { email } };
+    return { message: messages.unavailable, values: { email } };
   }
   redirect(`${localePath(lang, "/auth/sign-in")}?verified=1`);
 }
 
 export async function resendCodeAction(_previous, formData) {
+  const messages = messagesFor(langOf(formData));
   const email = text(formData, "email").trim().toLowerCase();
-  if (!email) return { message: "Enter your email address first.", values: { email } };
+  if (!email) return { message: messages.enterEmail, values: { email } };
   try {
     await auth.emailOtp.sendVerificationOtp({ email });
   } catch (error) {
     console.error("Resending the code failed:", error?.name, error?.code);
   }
   // The same answer whether or not the address has an account.
-  return { notice: "If that address has an account, a new code is on its way.", values: { email } };
+  return { notice: messages.resent, values: { email } };
 }
 
 export async function signInAction(_previous, formData) {
   const lang = langOf(formData);
+  const messages = messagesFor(lang);
   const email = text(formData, "email").trim().toLowerCase();
   const password = text(formData, "password");
   const next = safeNextPath(text(formData, "next"), localePath(lang, "/account"));
-  if (!email || !password) return { message: "Enter your email and password.", values: { email } };
+  if (!email || !password) return { message: messages.enterEmailPassword, values: { email } };
 
   let error;
   try {
     ({ error } = await auth.signIn.email({ email, password }));
   } catch (caught) {
     console.error("Sign-in failed:", caught?.name, caught?.code);
-    return { message: UNAVAILABLE, values: { email } };
+    return { message: messages.unavailable, values: { email } };
   }
 
   if (error) {
     if (error.code === "EMAIL_NOT_VERIFIED") redirect(`${localePath(lang, "/auth/verify")}?email=${encodeURIComponent(email)}`);
-    return { message: "The email or password is not right.", values: { email } };
+    return { message: messages.badCredentials, values: { email } };
   }
   redirect(next);
 }
@@ -118,13 +126,14 @@ export async function signOutAction(formData) {
 // For an account whose profile was never saved (see signUpAction): pick the role now.
 export async function completeProfileAction(_previous, formData) {
   const lang = langOf(formData);
+  const messages = messagesFor(lang);
   const values = { role: text(formData, "role"), orgName: text(formData, "orgName") };
   const current = await getCurrentUser();
   if (!current) redirect(`${localePath(lang, "/auth/sign-in")}?next=${encodeURIComponent(localePath(lang, "/account"))}`);
   if (current.profile) redirect(localePath(lang, "/account"));
 
   const choice = validateProfileChoice(values);
-  if (Object.keys(choice.errors).length > 0) return { errors: choice.errors, values };
+  if (Object.keys(choice.errors).length > 0) return { errors: translateErrors(choice.errors, messages), values };
 
   try {
     await prisma.profile.create({
@@ -132,7 +141,7 @@ export async function completeProfileAction(_previous, formData) {
     });
   } catch (error) {
     console.error("Profile was not saved:", error?.name, error?.code);
-    return { message: "We couldn't save your profile. Please try again.", values };
+    return { message: messages.profileSaveFailed, values };
   }
   redirect(localePath(lang, "/account"));
 }

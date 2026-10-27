@@ -2,7 +2,8 @@
 
 // The sign-up, verify, sign-in and finish-profile forms. They are Client Components only so they can show the
 // server's answer (errors or a message) without leaving the page; the checks and the saving happen in
-// app/auth/actions.js. A password is never sent back to the form.
+// app/[lang]/auth/actions.js. A password is never sent back to the form. The words come in as `copy` (from the
+// dictionary for the page's language), because this file runs in the browser.
 import { useActionState, useState } from "react";
 import { useParams } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
@@ -46,7 +47,7 @@ function Field({ name, label, type = "text", state, defaultValue, autoComplete, 
   );
 }
 
-// Every form tells the server which language it is in, so the next page is in the same language.
+// Every form tells the server which language it is in, so the next page and the messages are in the same language.
 function LangField() {
   const params = useParams();
   return <input type="hidden" name="lang" value={isLocale(params?.lang) ? params.lang : "en"} />;
@@ -71,21 +72,21 @@ function FormMessage({ state }) {
 }
 
 // Individual or organization, with the organization name shown only for organizations.
-function RoleChoice({ state }) {
+function RoleChoice({ state, copy }) {
   const [role, setRole] = useState(state?.values?.role ?? "individual");
   const roleError = state?.errors?.role;
   return (
     <>
       <div className={`field${roleError ? " has-error" : ""}`}>
         <fieldset className="radio-group" aria-describedby={roleError ? "role-error" : undefined}>
-          <legend>I am signing up as</legend>
+          <legend>{copy.roleLegend}</legend>
           <label className="radio-option">
             <input type="radio" name="role" value="individual" checked={role === "individual"} onChange={() => setRole("individual")} />
-            An individual
+            {copy.individual}
           </label>
           <label className="radio-option">
             <input type="radio" name="role" value="organization" checked={role === "organization"} onChange={() => setRole("organization")} />
-            An organization
+            {copy.organization}
           </label>
         </fieldset>
         {roleError ? (
@@ -95,39 +96,39 @@ function RoleChoice({ state }) {
         ) : null}
       </div>
       {role === "organization" ? (
-        <Field name="orgName" label="Organization name" state={state} autoComplete="organization" maxLength={150} />
+        <Field name="orgName" label={copy.orgName} state={state} autoComplete="organization" maxLength={150} />
       ) : null}
     </>
   );
 }
 
-export function SignUpForm() {
+export function SignUpForm({ copy }) {
   const [state, action, pending] = useActionState(signUpAction, null);
   return (
     <form className="auth-form" action={action} noValidate>
       <LangField />
       <FormMessage state={state} />
-      <Field name="name" label="Your name" state={state} autoComplete="name" maxLength={100} />
-      <Field name="email" label="Email" type="email" state={state} autoComplete="email" maxLength={254} />
+      <Field name="name" label={copy.name} state={state} autoComplete="name" maxLength={100} />
+      <Field name="email" label={copy.email} type="email" state={state} autoComplete="email" maxLength={254} />
       <Field
         name="password"
-        label="Password"
+        label={copy.password}
         type="password"
         state={state}
         autoComplete="new-password"
         minLength={8}
         maxLength={128}
-        hint="At least 8 characters."
+        hint={copy.passwordHint}
       />
-      <RoleChoice state={state} />
+      <RoleChoice state={state} copy={copy} />
       <button className="button button-primary" type="submit" disabled={pending}>
-        {pending ? "Creating account…" : "Create account"}
+        {pending ? copy.submitting : copy.submit}
       </button>
     </form>
   );
 }
 
-export function VerifyForm({ email }) {
+export function VerifyForm({ email, copy }) {
   const [state, action, pending] = useActionState(verifyAction, null);
   const [resendState, resendAction, resending] = useActionState(resendCodeAction, null);
   return (
@@ -135,50 +136,50 @@ export function VerifyForm({ email }) {
       <form className="auth-form" action={action} noValidate>
         <LangField />
         <FormMessage state={state} />
-        <Field name="email" label="Email" type="email" state={state} defaultValue={email} autoComplete="email" />
-        <Field name="otp" label="Code from your email" state={state} autoComplete="one-time-code" inputMode="numeric" maxLength={12} />
+        <Field name="email" label={copy.email} type="email" state={state} defaultValue={email} autoComplete="email" />
+        <Field name="otp" label={copy.code} state={state} autoComplete="one-time-code" inputMode="numeric" maxLength={12} />
         <button className="button button-primary" type="submit" disabled={pending}>
-          {pending ? "Checking…" : "Verify email"}
+          {pending ? copy.submitting : copy.submit}
         </button>
       </form>
       <form className="auth-form auth-secondary" action={resendAction} noValidate>
         <LangField />
         <FormMessage state={resendState} />
         <input type="hidden" name="email" value={state?.values?.email ?? email ?? ""} />
-        <p className="field-hint">Didn&rsquo;t get a code? Check your spam folder, then ask for a new one.</p>
+        <p className="field-hint">{copy.resendHint}</p>
         <button className="button button-secondary" type="submit" disabled={resending}>
-          {resending ? "Sending…" : "Send a new code"}
+          {resending ? copy.resending : copy.resend}
         </button>
       </form>
     </>
   );
 }
 
-export function SignInForm({ next }) {
+export function SignInForm({ next, copy }) {
   const [state, action, pending] = useActionState(signInAction, null);
   return (
     <form className="auth-form" action={action} noValidate>
       <LangField />
       <FormMessage state={state} />
       <input type="hidden" name="next" value={next ?? ""} />
-      <Field name="email" label="Email" type="email" state={state} autoComplete="email" />
-      <Field name="password" label="Password" type="password" state={state} autoComplete="current-password" />
+      <Field name="email" label={copy.email} type="email" state={state} autoComplete="email" />
+      <Field name="password" label={copy.password} type="password" state={state} autoComplete="current-password" />
       <button className="button button-primary" type="submit" disabled={pending}>
-        {pending ? "Signing in…" : "Sign in"}
+        {pending ? copy.submitting : copy.submit}
       </button>
     </form>
   );
 }
 
-export function CompleteProfileForm() {
+export function CompleteProfileForm({ copy, saveLabel, savingLabel }) {
   const [state, action, pending] = useActionState(completeProfileAction, null);
   return (
     <form className="auth-form" action={action} noValidate>
       <LangField />
       <FormMessage state={state} />
-      <RoleChoice state={state} />
+      <RoleChoice state={state} copy={copy} />
       <button className="button button-primary" type="submit" disabled={pending}>
-        {pending ? "Saving…" : "Save profile"}
+        {pending ? savingLabel : saveLabel}
       </button>
     </form>
   );

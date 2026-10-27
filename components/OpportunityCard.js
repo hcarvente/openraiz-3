@@ -7,28 +7,20 @@
 // in (not read from the clock here) so the card always renders the same output for the same props.
 //
 // `showAdminActions` adds the Edit link and the Delete button. It is off by default and no public page turns it on:
-// the admin routes and write APIs are locked (proxy.js), and a signed-in admin view will turn it on later.
+// the admin routes and write APIs are locked to admins, and a signed-in admin view will turn it on later.
 import Link from "next/link";
 import DeleteOpportunityButton from "@/components/DeleteOpportunityButton";
+import { fill, getDictionary } from "@/lib/i18n/dictionaries";
 
-const TYPE_LABELS = {
-  job: "Job",
-  internship: "Internship",
-  fellowship: "Fellowship",
-  volunteer: "Volunteer",
-  workshop: "Workshop",
-  event: "Event / meetup",
-  resource: "Resource",
-};
-const STATUS_LABELS = { active: "Active", filled: "Filled", archived: "Archived" };
-const RELEVANCE_LABELS = { required: "Required", preferred: "Preferred", welcomed: "Welcomed", relevant: "Relevant" };
-const LOCATION_LABELS = { remote: "Remote", hybrid: "Hybrid", onsite: "On-site" };
-
-// "2026-12-15" -> "Dec 15, 2026". Always in UTC, so the calendar day never shifts with the viewer's time zone.
-function formatDate(isoDate) {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(
-    new Date(isoDate),
-  );
+// "2026-12-15" -> "Dec 15, 2026" in English, "15 dic 2026" in Spanish. Always in UTC, so the calendar day never shifts
+// with the viewer's time zone.
+function formatDate(isoDate, lang) {
+  return new Intl.DateTimeFormat(lang === "es" ? "es" : "en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(isoDate));
 }
 
 function Icon({ size = 16, children }) {
@@ -58,13 +50,14 @@ const BriefcaseShapes = (
   </>
 );
 
-export default function OpportunityCard({ opportunity, today, showAdminActions = false }) {
-  const typeLabel = TYPE_LABELS[opportunity.type] ?? opportunity.type;
-  const statusLabel = STATUS_LABELS[opportunity.status] ?? opportunity.status;
-  const relevanceLabel = RELEVANCE_LABELS[opportunity.livedExperienceRelevance] ?? opportunity.livedExperienceRelevance;
+export default function OpportunityCard({ opportunity, today, lang = "en", showAdminActions = false }) {
+  const t = getDictionary(lang).card;
+  const typeLabel = t.types[opportunity.type] ?? opportunity.type;
+  const statusLabel = t.statuses[opportunity.status] ?? opportunity.status;
+  const relevanceLabel = t.relevance[opportunity.livedExperienceRelevance] ?? opportunity.livedExperienceRelevance;
 
   // Remote shows just "Remote"; hybrid / on-site add the place when we have one.
-  const arrangement = LOCATION_LABELS[opportunity.locationType] ?? opportunity.locationType;
+  const arrangement = t.locations[opportunity.locationType] ?? opportunity.locationType;
   const place = [opportunity.city, opportunity.state].filter(Boolean).join(", ");
   const location = opportunity.locationType === "remote" || !place ? arrangement : `${arrangement} · ${place}`;
 
@@ -89,11 +82,11 @@ export default function OpportunityCard({ opportunity, today, showAdminActions =
           </Icon>
           {hasDeadline ? (
             <span>
-              {deadlinePassed ? "Deadline passed " : "Apply by "}
-              <time dateTime={opportunity.deadline}>{formatDate(opportunity.deadline)}</time>
+              {deadlinePassed ? t.deadlinePassed : t.applyBy}{" "}
+              <time dateTime={opportunity.deadline}>{formatDate(opportunity.deadline, lang)}</time>
             </span>
           ) : (
-            <span>Rolling deadline</span>
+            <span>{t.rolling}</span>
           )}
         </p>
       </div>
@@ -124,7 +117,7 @@ export default function OpportunityCard({ opportunity, today, showAdminActions =
       <div className="card-footer">
         <ul className="card-pills">
           <li className={`pill pill-status-${opportunity.status}`}>{statusLabel}</li>
-          <li className="pill pill-relevance">Lived experience: {relevanceLabel}</li>
+          <li className="pill pill-relevance">{fill(t.livedExperience, { level: relevanceLabel })}</li>
         </ul>
         {showAdminActions ? (
           <div className="card-actions">

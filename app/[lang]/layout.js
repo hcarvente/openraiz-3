@@ -4,9 +4,14 @@ import "../globals.css";
 import { notFound } from "next/navigation";
 import SiteShell from "@/components/SiteShell";
 import { LOCALES, isLocale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { siteMetadata } from "@/lib/siteMetadata";
 
-export const metadata = siteMetadata;
+// Same as the shared metadata, but with the description in the page's language.
+export async function generateMetadata({ params }) {
+  const { lang } = await params;
+  return { ...siteMetadata, description: getDictionary(lang).meta.description };
+}
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));

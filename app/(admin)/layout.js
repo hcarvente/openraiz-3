@@ -10,7 +10,7 @@ export default function AdminRootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <SiteShell lang="en">{children}</SiteShell>
+        <SiteShell lang="en" showLanguageToggle={false}>{children}</SiteShell>
       </body>
     </html>
   );

@@ -6,12 +6,16 @@ import { CompleteProfileForm } from "@/components/auth/AuthForms";
 import { getCurrentUser } from "@/lib/roles";
 import { signOutAction } from "@/app/[lang]/auth/actions";
 import { localePath } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
-export const metadata = { title: "Your account | OpenRaiz" };
-
-const ROLE_LABELS = { individual: "Individual", organization: "Organization" };
+export async function generateMetadata({ params }) {
+  const { lang } = await params;
+  return { title: getDictionary(lang).meta.titles.account };
+}
 
 async function AccountContent({ lang }) {
+  const t = getDictionary(lang).account;
+  const signUpCopy = getDictionary(lang).auth.signUp;
   let current;
   try {
     current = await getCurrentUser();
@@ -19,47 +23,49 @@ async function AccountContent({ lang }) {
     console.error("Account page could not load:", error?.name, error?.code);
     return (
       <p className="state-message state-error" role="alert">
-        We couldn&rsquo;t load your account right now. Please try again in a moment.
+        {t.loadError}
       </p>
     );
   }
   if (!current) redirect(`${localePath(lang, "/auth/sign-in")}?next=${encodeURIComponent(localePath(lang, "/account"))}`);
   const { user, profile, isVerified, isAdmin } = current;
+  const roleLabels = { individual: t.individual, organization: t.organization };
 
   return (
     <>
       <dl className="account-details">
-        <dt>Name</dt>
+        <dt>{t.name}</dt>
         <dd>{profile?.displayName ?? user.name}</dd>
-        <dt>Email</dt>
+        <dt>{t.email}</dt>
         <dd>{user.email}</dd>
-        <dt>Email status</dt>
-        <dd>{isVerified ? "Verified" : "Not verified yet"}</dd>
-        <dt>Account type</dt>
+        <dt>{t.emailStatus}</dt>
+        <dd>{isVerified ? t.verified : t.notVerified}</dd>
+        <dt>{t.accountType}</dt>
         <dd>
-          {profile ? ROLE_LABELS[profile.role] : "Not set yet"}
+          {profile ? roleLabels[profile.role] : t.notSet}
           {profile?.orgName ? ` — ${profile.orgName}` : ""}
-          {isAdmin ? " · Administrator" : ""}
+          {isAdmin ? ` · ${t.administrator}` : ""}
         </dd>
       </dl>
 
       {!isVerified ? (
         <p className="form-notice" role="status">
-          Verify your email to be able to post. <Link href={`${localePath(lang, "/auth/verify")}?email=${encodeURIComponent(user.email)}`}>Enter your code</Link>
+          {t.verifyNotice}{" "}
+          <Link href={`${localePath(lang, "/auth/verify")}?email=${encodeURIComponent(user.email)}`}>{t.enterCode}</Link>
         </p>
       ) : null}
 
       {!profile ? (
         <section aria-labelledby="finish-profile">
-          <h2 id="finish-profile">Finish your profile</h2>
-          <CompleteProfileForm />
+          <h2 id="finish-profile">{t.finishHeading}</h2>
+          <CompleteProfileForm copy={signUpCopy} saveLabel={t.save} savingLabel={t.saving} />
         </section>
       ) : null}
 
       {isAdmin ? (
         <p>
           <Link className="button button-secondary" href="/admin/opportunities/new">
-            Add an opportunity
+            {t.addOpportunity}
           </Link>
         </p>
       ) : null}
@@ -67,7 +73,7 @@ async function AccountContent({ lang }) {
       <form action={signOutAction}>
         <input type="hidden" name="lang" value={lang} />
         <button className="button button-secondary" type="submit">
-          Sign out
+          {t.signOut}
         </button>
       </form>
     </>
@@ -76,11 +82,12 @@ async function AccountContent({ lang }) {
 
 export default async function AccountPage({ params }) {
   const { lang } = await params;
+  const t = getDictionary(lang).account;
   return (
     <>
       <main id="main-content" tabIndex={-1} className="page-main auth-page">
-        <h1>Your account</h1>
-        <Suspense fallback={<p className="state-message">Loading your account&hellip;</p>}>
+        <h1>{t.heading}</h1>
+        <Suspense fallback={<p className="state-message">{t.loading}</p>}>
           <AccountContent lang={lang} />
         </Suspense>
       </main>

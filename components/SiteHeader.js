@@ -1,14 +1,17 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import AuthLinks from "@/components/AuthLinks";
+import LanguageToggle from "@/components/LanguageToggle";
 import NavLinks from "@/components/NavLinks";
 import { localePath } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 // The site header, placed once in app/layout.js: the OpenRaiz sprout mark plus wordmark, the main navigation (About,
 // Opportunities, then sign-in or account links), and a small decorative accent line.
 // The sprout is ported from the original site's header (a stem, two leaves,
 // and roots below a ground line, tying to "raíz" = root).
-export default function SiteHeader({ lang = "en" }) {
+export default function SiteHeader({ lang = "en", showLanguageToggle = true }) {
+  const t = getDictionary(lang);
   return (
     <header className="site-header">
       <Link className="logo" href={localePath(lang)}>
@@ -34,13 +37,18 @@ export default function SiteHeader({ lang = "en" }) {
         </svg>
         OpenRaiz
       </Link>
-      <nav className="site-nav" aria-label="Primary">
+      <nav className="site-nav" aria-label={t.nav.label}>
         <Suspense fallback={null}>
-          <NavLinks />
+          <NavLinks labels={{ about: t.nav.about, opportunities: t.nav.opportunities }} />
         </Suspense>
         <Suspense fallback={null}>
           <AuthLinks lang={lang} />
         </Suspense>
+        {showLanguageToggle ? (
+          <Suspense fallback={null}>
+            <LanguageToggle lang={lang} label={t.nav.otherLanguage} hint={t.nav.otherLanguageHint} />
+          </Suspense>
+        ) : null}
       </nav>
       <div className="header-accent" aria-hidden="true" />
     </header>
