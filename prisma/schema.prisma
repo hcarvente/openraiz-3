@@ -84,3 +84,18 @@ model Opportunity {
   applyMethodType  ApplyMethodType
   applyMethodValue String
 }
+
+enum ProfileRole {
+  individual
+  organization
+}
+
+// One row per signed-in account (Neon Auth user). Admin is NOT stored here: it is worked out from ADMIN_EMAILS.
+model Profile {
+  id          String      @id @default(cuid())
+  userId      String      @unique // the Neon Auth user id (neon_auth.user.id)
+  role        ProfileRole
+  displayName String
+  orgName     String? // set when role is organization
+  createdAt   DateTime    @default(now())
+}
