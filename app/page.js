@@ -5,7 +5,8 @@ import SiteHeader from "@/components/SiteHeader";
 import OpportunityCard from "@/components/OpportunityCard";
 import DeletedNotice from "@/components/DeletedNotice";
 import { prisma } from "@/lib/prisma";
-import { serializeOpportunity } from "@/lib/serializeOpportunity";
+import { serializePublicOpportunity } from "@/lib/serializeOpportunity";
+import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
 
 // Reads the opportunities and renders the list, or an empty or error message.
 // With Cache Components enabled, an uncached database read must sit inside <Suspense> (see Home below).
@@ -13,9 +14,10 @@ async function OpportunityList() {
   let opportunities;
   try {
     const rows = await prisma.opportunity.findMany({
+      where: PUBLIC_WHERE, // only approved, non-archived listings
       orderBy: [{ datePosted: "desc" }, { id: "asc" }], // same order as GET /api/opportunities
     });
-    opportunities = rows.map(serializeOpportunity); // dates become "YYYY-MM-DD" strings
+    opportunities = rows.map(serializePublicOpportunity); // dates become "YYYY-MM-DD" strings
   } catch (error) {
     // Log only the error's name and code on the server; the visitor sees a plain message.
     console.error("Homepage could not load opportunities:", error?.name, error?.code);

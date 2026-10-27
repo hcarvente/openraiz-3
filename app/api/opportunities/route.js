@@ -1,20 +1,22 @@
-// GET  /api/opportunities: returns every opportunity (any status) as a flat JSON array.
+// GET  /api/opportunities: returns the public opportunities (approved, not archived) as a flat JSON array.
 // POST /api/opportunities: validates a flat JSON body and creates one opportunity.
 // All database access and validation happen here on the server; the browser only sees JSON.
 //
 // SECURITY: GET is public. POST is admin only (requireAdminApi: 401 if not signed in, 403 if not admin).
 import { prisma } from "@/lib/prisma";
 import { requireAdminApi } from "@/lib/roles";
-import { serializeOpportunity } from "@/lib/serializeOpportunity";
+import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
+import { serializeOpportunity, serializePublicOpportunity } from "@/lib/serializeOpportunity";
 import { validateOpportunity } from "@/lib/validateOpportunity";
 
 export async function GET() {
   try {
     const opportunities = await prisma.opportunity.findMany({
+      where: PUBLIC_WHERE, // pending, rejected and archived listings are never public
       // A fixed order keeps the list from reshuffling after edits: newest posting first.
       orderBy: [{ datePosted: "desc" }, { id: "asc" }],
     });
-    return Response.json(opportunities.map(serializeOpportunity));
+    return Response.json(opportunities.map(serializePublicOpportunity));
   } catch (error) {
     // Log only the error's name and code on the server; never send internals to the browser.
     console.error("GET /api/opportunities failed:", error?.name, error?.code);
@@ -23,7 +25,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const denied = await requireAdminApi();
+  const { denied, current } = await requireAdminApi();
   if (denied) return denied;
 
   // 1. Read the JSON body. Malformed or empty JSON is the client's mistake: 400.
@@ -42,7 +44,10 @@ export async function POST(request) {
 
   // 3. Save, then return the new opportunity in the same flat shape GET uses.
   try {
-    const created = await prisma.opportunity.create({ data: result.data });
+    // What an admin creates is approved straight away and owned by that admin.
+    const created = await prisma.opportunity.create({
+      data: { ...result.data, approvalStatus: "approved", ownerUserId: current.user.id },
+    });
     return Response.json(serializeOpportunity(created), { status: 201 });
   } catch (error) {
     console.error("POST /api/opportunities failed:", error?.name, error?.code);

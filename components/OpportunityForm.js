@@ -8,11 +8,12 @@
 //   mode="edit":   starts from `initialValues` (the saved opportunity) and sends only the fields that
 //                  changed to PATCH /api/opportunities/[opportunityId].
 //
-// LOCAL DEVELOPMENT ONLY: there is no sign-in yet, so this form must not be deployed publicly.
+// Admin only: the pages that show this form, and the API it calls, check for a signed-in admin.
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   APPLY_METHOD_OPTIONS,
+  CATEGORY_OPTIONS,
   FIELD_LABELS,
   FIELD_LIMITS,
   LIVED_EXPERIENCE_OPTIONS,
@@ -21,6 +22,7 @@ import {
   STATUS_OPTIONS,
   emptyOpportunityValues,
   groupErrorsByField,
+  showsEventDate,
   showsLocationFields,
   todayLocalDate,
   toPatchBody,
@@ -308,6 +310,58 @@ export default function OpportunityForm({ mode = "create", opportunityId, initia
         </div>
       </section>
 
+      <section className="form-section" aria-labelledby="section-more">
+        <h2 id="section-more">More details (optional)</h2>
+        <div className="form-grid">
+          <Field
+            name="summary"
+            label="Short summary"
+            wide
+            hint={`A one- or two-sentence blurb shown on the listing card (up to ${FIELD_LIMITS.summary} characters).`}
+            error={fieldErrors.summary}
+          >
+            {(p) => <textarea rows={2} {...p} {...bind("summary")} maxLength={FIELD_LIMITS.summary} />}
+          </Field>
+
+          <Field name="category" label="Category" error={fieldErrors.category}>
+            {(p) => (
+              <select {...p} {...bind("category")}>
+                <option value="">No category</option>
+                {CATEGORY_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            )}
+          </Field>
+
+          <Field name="commitment" label="Time commitment" hint="For example: 4 hours a week." error={fieldErrors.commitment}>
+            {(p) => <input type="text" {...p} {...bind("commitment")} maxLength={FIELD_LIMITS.commitment} />}
+          </Field>
+
+          <Field
+            name="requirements"
+            label="Requirements"
+            wide
+            hint="What a person needs to apply or take part."
+            error={fieldErrors.requirements}
+          >
+            {(p) => <textarea rows={4} {...p} {...bind("requirements")} maxLength={FIELD_LIMITS.requirements} />}
+          </Field>
+
+          <Field
+            name="skills"
+            label="Skills"
+            wide
+            hint="Separate with commas, for example: public speaking, grant writing."
+            error={fieldErrors.skills}
+          >
+            {(p) => <input type="text" {...p} {...bind("skills")} />}
+          </Field>
+        </div>
+      </section>
+
       <section className="form-section" aria-labelledby="section-location">
         <h2 id="section-location">Location &amp; application</h2>
         <div className="form-grid">
@@ -386,6 +440,12 @@ export default function OpportunityForm({ mode = "create", opportunityId, initia
           <Field name="datePosted" label="Date posted" required error={fieldErrors.datePosted}>
             {(p) => <input type="date" {...p} value={datePostedValue} onChange={(event) => setValue("datePosted", event.target.value)} />}
           </Field>
+
+          {showsEventDate(values.type) ? (
+            <Field name="eventDate" label="Event date (optional)" hint="Leave blank if the date is flexible." error={fieldErrors.eventDate}>
+              {(p) => <input type="date" {...p} {...bind("eventDate")} />}
+            </Field>
+          ) : null}
 
           <Field
             name="deadline"

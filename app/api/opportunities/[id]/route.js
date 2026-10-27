@@ -1,4 +1,4 @@
-// GET    /api/opportunities/[id]: returns one opportunity as flat JSON, or 404 if there is none.
+// GET    /api/opportunities/[id]: returns one public opportunity as flat JSON, or 404 if there is none (or it is not public).
 // PATCH  /api/opportunities/[id]: changes only the fields named in the JSON body and returns the updated opportunity.
 // DELETE /api/opportunities/[id]: permanently removes the opportunity and returns { id, deleted: true }, or 404 if there is none.
 // The [id] in the folder name is a dynamic segment: for /api/opportunities/abc123 the id is "abc123".
@@ -7,7 +7,8 @@
 // SECURITY: GET is public. PATCH and DELETE are admin only (requireAdminApi: 401 if not signed in, 403 if not admin).
 import { prisma } from "@/lib/prisma";
 import { requireAdminApi } from "@/lib/roles";
-import { serializeOpportunity } from "@/lib/serializeOpportunity";
+import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
+import { serializeOpportunity, serializePublicOpportunity } from "@/lib/serializeOpportunity";
 import { validateOpportunityUpdate } from "@/lib/validateOpportunityUpdate";
 
 // Real ids are letters, digits, hyphens and underscores (generated ids and the old readable ids).
@@ -24,14 +25,15 @@ export async function GET(_request, { params }) {
   }
 
   try {
-    const opportunity = await prisma.opportunity.findUnique({ where: { id } });
+    // Only public listings: a pending, rejected or archived one answers "not found", like one that does not exist.
+    const opportunity = await prisma.opportunity.findFirst({ where: { id, ...PUBLIC_WHERE } });
 
     if (!opportunity) {
       // The message does not repeat the id back to the caller.
       return Response.json({ error: "Opportunity not found." }, { status: 404 });
     }
 
-    return Response.json(serializeOpportunity(opportunity));
+    return Response.json(serializePublicOpportunity(opportunity));
   } catch (error) {
     // Log only the error's name and code on the server; never send internals to the browser.
     console.error("GET /api/opportunities/[id] failed:", error?.name, error?.code);
@@ -40,7 +42,7 @@ export async function GET(_request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
-  const denied = await requireAdminApi();
+  const { denied } = await requireAdminApi();
   if (denied) return denied;
 
   const { id } = await params;
@@ -85,7 +87,7 @@ export async function PATCH(request, { params }) {
 }
 
 export async function DELETE(_request, { params }) {
-  const denied = await requireAdminApi();
+  const { denied } = await requireAdminApi();
   if (denied) return denied;
 
   const { id } = await params;

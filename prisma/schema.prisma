@@ -17,6 +17,16 @@ enum OpportunityType {
   internship
   fellowship
   volunteer
+  workshop
+  event // shown as "Event / meetup"
+  resource
+}
+
+// Who may see a listing: only "approved" ones are public. New posts from people start as "pending".
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
 }
 
 enum LivedExperienceRelevance {
@@ -83,6 +93,20 @@ model Opportunity {
   // Original `applyMethod` object, flattened.
   applyMethodType  ApplyMethodType
   applyMethodValue String
+
+  summary      String? // a short blurb for cards and search (up to 280 characters)
+  requirements String?
+  skills       String[]
+  category     String? // one of the categories in lib/opportunityTaxonomy.js
+  commitment   String? // for example "4 hours a week"
+  eventDate    DateTime? @db.Date // workshops and events only
+
+  approvalStatus  ApprovalStatus @default(pending) // safe default: not public until approved
+  rejectionReason String?
+  ownerUserId     String? // the poster's Neon Auth user id; empty means OpenRaiz itself
+
+  @@index([approvalStatus, status])
+  @@index([ownerUserId])
 }
 
 enum ProfileRole {

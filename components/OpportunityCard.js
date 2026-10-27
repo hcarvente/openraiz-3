@@ -11,7 +11,15 @@
 import Link from "next/link";
 import DeleteOpportunityButton from "@/components/DeleteOpportunityButton";
 
-const TYPE_LABELS = { job: "Job", internship: "Internship", fellowship: "Fellowship", volunteer: "Volunteer" };
+const TYPE_LABELS = {
+  job: "Job",
+  internship: "Internship",
+  fellowship: "Fellowship",
+  volunteer: "Volunteer",
+  workshop: "Workshop",
+  event: "Event / meetup",
+  resource: "Resource",
+};
 const STATUS_LABELS = { active: "Active", filled: "Filled", archived: "Archived" };
 const RELEVANCE_LABELS = { required: "Required", preferred: "Preferred", welcomed: "Welcomed", relevant: "Relevant" };
 const LOCATION_LABELS = { remote: "Remote", hybrid: "Hybrid", onsite: "On-site" };
