@@ -43,6 +43,7 @@ async function OpportunityList({ lang }) {
 
   return (
     <>
+      {lang === "es" ? <p className="page-note">{t.englishOnly}</p> : null}
       <p className="result-count">
         {fill(count === 1 ? t.countOne : t.countMany, { count })}
       </p>

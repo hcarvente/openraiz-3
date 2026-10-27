@@ -860,3 +860,136 @@ main:focus {
   border-left: 1px solid #d9d0c0;
   border-radius: 0 999px 999px 0;
 }
+
+/* ---------- Opportunity cards: the title is the link to the detail page ---------- */
+.card-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card-title a:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.page-note {
+  margin: 0.5rem 0 1rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Opportunity detail page ---------- */
+.detail-page {
+  max-width: 62rem;
+}
+
+.detail-header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  line-height: 1.2;
+}
+
+.detail-org {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 1.1rem;
+  color: var(--color-muted);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 56rem) {
+  .detail-grid {
+    grid-template-columns: minmax(0, 1fr) 18rem;
+    align-items: start;
+  }
+}
+
+.detail-main section {
+  margin-top: 1.75rem;
+}
+
+.detail-main h2,
+.detail-aside h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  color: var(--color-primary);
+}
+
+.detail-summary {
+  margin: 1rem 0 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.detail-text {
+  white-space: pre-line; /* keep the line breaks the poster typed; the text is plain text, never HTML */
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.apply-target {
+  margin-left: 0.75rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  padding: 0.25rem 0.7rem;
+  background: var(--color-nav-bg);
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.detail-aside {
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid #e5ded2;
+  border-radius: 1rem;
+}
+
+.key-details {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+}
+
+.key-details dt {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.key-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}

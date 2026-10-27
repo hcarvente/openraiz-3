@@ -10,18 +10,9 @@
 // the admin routes and write APIs are locked to admins, and a signed-in admin view will turn it on later.
 import Link from "next/link";
 import DeleteOpportunityButton from "@/components/DeleteOpportunityButton";
+import { formatDate } from "@/lib/formatDate";
+import { localePath } from "@/lib/i18n/config";
 import { fill, getDictionary } from "@/lib/i18n/dictionaries";
-
-// "2026-12-15" -> "Dec 15, 2026" in English, "15 dic 2026" in Spanish. Always in UTC, so the calendar day never shifts
-// with the viewer's time zone.
-function formatDate(isoDate, lang) {
-  return new Intl.DateTimeFormat(lang === "es" ? "es" : "en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(isoDate));
-}
 
 function Icon({ size = 16, children }) {
   return (
@@ -72,8 +63,14 @@ export default function OpportunityCard({ opportunity, today, lang = "en", showA
           <Icon size={22}>{BriefcaseShapes}</Icon>
         </span>
         <div className="card-heading">
-          <h2 className="card-title">{opportunity.title}</h2>
-          <p className="card-org">{opportunity.organization}</p>
+          <h2 className="card-title">
+            <Link href={localePath(lang, `/opportunities/${opportunity.id}`)} lang="en">
+              {opportunity.title}
+            </Link>
+          </h2>
+          <p className="card-org" lang="en">
+            {opportunity.organization}
+          </p>
         </div>
         <p className={`card-deadline${deadlinePassed ? " is-past" : ""}`}>
           <Icon>
