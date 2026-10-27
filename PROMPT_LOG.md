@@ -3437,3 +3437,28 @@ The titles shown in the confirmation, the button names and the notes are escaped
 - **Commit message (approved):** `Add Delete button with inline confirmation and success note` (no Co-Authored-By trailer).
 - **Pre-commit checks (agent):** exactly those seven files staged; the staged diff reviewed; no `.env`, generated, build, package, binary or SQL files, and no credential, connection string or hostname in the staged diff (scanned); `npm run lint` and `npm run build` pass; the four existing development opportunities are unchanged (same `xmin`, `ctid` and content hash as at the start of Step 5.4); the original OpenRaiz repo unchanged (0 changed files, commit `0113d35`).
 - **Commit reference:** PENDING — the hash is not known until the commit exists; to be recorded in a later log update.
+
+
+---
+
+# Week 7 — OpenRaiz 3.0 integration (new repo `hcarvente/openraiz-3`, branch `week7-integration`)
+
+Plan: `~/.claude/plans/pasted-content-id-cefb-openraiz-week-delegated-sunbeam.md` (v2). Monster Interview is ported as a neutral "OpenRaiz Coach": no Halloween or Dracula theme.
+
+## Step 0 — Baseline (no code change; read-only except one approved migration)
+
+- **Date:** 2026-10-26
+- **Setup done by the user:** new private GitHub repo `hcarvente/openraiz-3`; new Neon branch `week7-dev`; `.env` created locally (gitignored) with the pooled `DATABASE_URL` and direct `DIRECT_URL`.
+- **Results (Claude-verified, only what actually ran):**
+  - `npm ci` and `npm run lint` pass. `npm run build` fails on a fresh checkout until `prisma generate` has run (the generated client is gitignored); it passes after `prisma generate`.
+  - `.env` shape checked without printing secrets: plain text, no quotes, ignored by Git, pooled and direct strings on the same endpoint, different from the old openraiz-2 database, region AWS us-east-2.
+  - `prisma migrate status` showed `week7-dev` was empty; with the user's approval `prisma migrate deploy` applied `20261016011916_init`. The database now has `Opportunity` and `_prisma_migrations`; `Opportunity` has 0 rows.
+  - Monster Interview `npm test`: 73 of 73 pass (fake client, no tokens used).
+  - V1 data vs schema enums: type, location type, lived-experience relevance, apply method and source values all fit the enums; V1 status has only active and filled; 2 of 10 listings have no deadline (allowed).
+- **Git:** `gh` installed with Homebrew and authenticated by the user; `main` and `week7-integration` pushed to the new repo (both at `c2e9d9b`). The first push failed on the old stored credential.
+
+## Step 1 — Prepare branch and deploy-safe build (awaiting the user's commit approval)
+
+- **Changes:** `package.json` and `package-lock.json` renamed to `openraiz-3`; `"postinstall": "prisma generate"` added; `prisma.config.ts` no longer throws when `DIRECT_URL` is unset (it falls back to an unusable placeholder host named `DIRECT_URL-is-not-set.invalid`), because `prisma generate` ran during install and failed without env vars; `.env.example` gained placeholders for `ADMIN_EMAILS`, `GEMINI_API_KEY` and `AI_ENABLED`.
+- **Tests (Claude-verified):** a fresh folder with only the package files, config and `prisma/`, installed with `DIRECT_URL` and `DATABASE_URL` unset, ran `postinstall` and produced `generated/prisma`; before the config fix the same install failed with `Cannot resolve environment variable: DIRECT_URL`. `npm run lint` and `npm run build` pass in the project.
+- **Known limit:** migrate commands without `DIRECT_URL` now fail with `P1001: Can't reach database server at DIRECT_URL-is-not-set.invalid` instead of the old explicit message.
