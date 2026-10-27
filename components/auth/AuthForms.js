@@ -4,13 +4,15 @@
 // server's answer (errors or a message) without leaving the page; the checks and the saving happen in
 // app/auth/actions.js. A password is never sent back to the form.
 import { useActionState, useState } from "react";
+import { useParams } from "next/navigation";
+import { isLocale } from "@/lib/i18n/config";
 import {
   completeProfileAction,
   resendCodeAction,
   signInAction,
   signUpAction,
   verifyAction,
-} from "@/app/auth/actions";
+} from "@/app/[lang]/auth/actions";
 
 function Field({ name, label, type = "text", state, defaultValue, autoComplete, hint, required = true, ...rest }) {
   const error = state?.errors?.[name];
@@ -42,6 +44,12 @@ function Field({ name, label, type = "text", state, defaultValue, autoComplete, 
       ) : null}
     </div>
   );
+}
+
+// Every form tells the server which language it is in, so the next page is in the same language.
+function LangField() {
+  const params = useParams();
+  return <input type="hidden" name="lang" value={isLocale(params?.lang) ? params.lang : "en"} />;
 }
 
 function FormMessage({ state }) {
@@ -97,6 +105,7 @@ export function SignUpForm() {
   const [state, action, pending] = useActionState(signUpAction, null);
   return (
     <form className="auth-form" action={action} noValidate>
+      <LangField />
       <FormMessage state={state} />
       <Field name="name" label="Your name" state={state} autoComplete="name" maxLength={100} />
       <Field name="email" label="Email" type="email" state={state} autoComplete="email" maxLength={254} />
@@ -124,6 +133,7 @@ export function VerifyForm({ email }) {
   return (
     <>
       <form className="auth-form" action={action} noValidate>
+        <LangField />
         <FormMessage state={state} />
         <Field name="email" label="Email" type="email" state={state} defaultValue={email} autoComplete="email" />
         <Field name="otp" label="Code from your email" state={state} autoComplete="one-time-code" inputMode="numeric" maxLength={12} />
@@ -132,6 +142,7 @@ export function VerifyForm({ email }) {
         </button>
       </form>
       <form className="auth-form auth-secondary" action={resendAction} noValidate>
+        <LangField />
         <FormMessage state={resendState} />
         <input type="hidden" name="email" value={state?.values?.email ?? email ?? ""} />
         <p className="field-hint">Didn&rsquo;t get a code? Check your spam folder, then ask for a new one.</p>
@@ -147,6 +158,7 @@ export function SignInForm({ next }) {
   const [state, action, pending] = useActionState(signInAction, null);
   return (
     <form className="auth-form" action={action} noValidate>
+      <LangField />
       <FormMessage state={state} />
       <input type="hidden" name="next" value={next ?? ""} />
       <Field name="email" label="Email" type="email" state={state} autoComplete="email" />
@@ -162,6 +174,7 @@ export function CompleteProfileForm() {
   const [state, action, pending] = useActionState(completeProfileAction, null);
   return (
     <form className="auth-form" action={action} noValidate>
+      <LangField />
       <FormMessage state={state} />
       <RoleChoice state={state} />
       <button className="button button-primary" type="submit" disabled={pending}>

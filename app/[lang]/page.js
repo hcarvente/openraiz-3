@@ -2,8 +2,10 @@
 // database, so only the header's sign-in links are worked out per visitor.
 import Image from "next/image";
 import Link from "next/link";
+import { localePath } from "@/lib/i18n/config";
 
-export default function LandingPage() {
+export default async function LandingPage({ params }) {
+  const { lang } = await params;
   return (
     <div className="landing-background">
       {/* Phone-sized screens crop the wide photo badly as a page background, so they get this band instead (see globals.css). */}
@@ -28,7 +30,7 @@ export default function LandingPage() {
             You don&rsquo;t have to disclose anything about your history to browse. Every listing tells you how it
             relates to lived experience; nothing here asks you to prove yours.
           </p>
-          <Link className="about-cta" href="/opportunities">
+          <Link className="about-cta" href={localePath(lang, "/opportunities")}>
             Browse opportunities
           </Link>
           <p className="about-incubated">

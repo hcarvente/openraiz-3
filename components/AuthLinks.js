@@ -1,8 +1,9 @@
 // The sign-in / account links in the header. It reads the session (cookies), so SiteHeader shows it inside <Suspense>.
 import Link from "next/link";
 import { auth } from "@/lib/auth/server";
+import { localePath } from "@/lib/i18n/config";
 
-export default async function AuthLinks() {
+export default async function AuthLinks({ lang = "en" }) {
   let user = null;
   try {
     const { data: session } = await auth.getSession();
@@ -14,10 +15,10 @@ export default async function AuthLinks() {
   if (!user) {
     return (
       <>
-        <Link href="/auth/sign-in">Sign in</Link>
-        <Link href="/auth/sign-up">Create account</Link>
+        <Link href={localePath(lang, "/auth/sign-in")}>Sign in</Link>
+        <Link href={localePath(lang, "/auth/sign-up")}>Create account</Link>
       </>
     );
   }
-  return <Link href="/account">Account</Link>;
+  return <Link href={localePath(lang, "/account")}>Account</Link>;
 }

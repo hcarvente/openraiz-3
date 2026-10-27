@@ -14,7 +14,7 @@ export default function NewOpportunityPage() {
     <>
       <main id="main-content" tabIndex={-1} className="page-main">
         <p className="back-link">
-          <Link href="/opportunities">&larr; Back to opportunities</Link>
+          <Link href="/en/opportunities">&larr; Back to opportunities</Link>
         </p>
         <Suspense fallback={<p className="state-message">Loading&hellip;</p>}>
           <AdminGate next="/admin/opportunities/new">

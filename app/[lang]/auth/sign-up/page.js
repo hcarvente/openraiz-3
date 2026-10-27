@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { SignUpForm } from "@/components/auth/AuthForms";
+import { localePath } from "@/lib/i18n/config";
 
 export const metadata = { title: "Create account | OpenRaiz" };
 
-export default function SignUpPage() {
+export default async function SignUpPage({ params }) {
+  const { lang } = await params;
   return (
     <>
       <main id="main-content" tabIndex={-1} className="page-main auth-page">
@@ -13,7 +15,7 @@ export default function SignUpPage() {
         </p>
         <SignUpForm />
         <p className="auth-alt">
-          Already have an account? <Link href="/auth/sign-in">Sign in</Link>
+          Already have an account? <Link href={localePath(lang, "/auth/sign-in")}>Sign in</Link>
         </p>
       </main>
     </>

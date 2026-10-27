@@ -14,7 +14,7 @@ export default function EditOpportunityNotFound() {
           We couldn&rsquo;t find that opportunity. It may have been removed, or the link may be incorrect.
         </p>
         <p>
-          <Link className="button button-primary" href="/opportunities">
+          <Link className="button button-primary" href="/en/opportunities">
             Back to opportunities
           </Link>
         </p>

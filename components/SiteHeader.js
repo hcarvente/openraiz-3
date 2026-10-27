@@ -2,15 +2,16 @@ import { Suspense } from "react";
 import Link from "next/link";
 import AuthLinks from "@/components/AuthLinks";
 import NavLinks from "@/components/NavLinks";
+import { localePath } from "@/lib/i18n/config";
 
 // The site header, placed once in app/layout.js: the OpenRaiz sprout mark plus wordmark, the main navigation (About,
 // Opportunities, then sign-in or account links), and a small decorative accent line.
 // The sprout is ported from the original site's header (a stem, two leaves,
 // and roots below a ground line, tying to "raíz" = root).
-export default function SiteHeader() {
+export default function SiteHeader({ lang = "en" }) {
   return (
     <header className="site-header">
-      <Link className="logo" href="/">
+      <Link className="logo" href={localePath(lang)}>
         <svg
           className="logo-mark"
           width="30"
@@ -38,7 +39,7 @@ export default function SiteHeader() {
           <NavLinks />
         </Suspense>
         <Suspense fallback={null}>
-          <AuthLinks />
+          <AuthLinks lang={lang} />
         </Suspense>
       </nav>
       <div className="header-accent" aria-hidden="true" />

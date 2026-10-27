@@ -6,7 +6,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/roles";
 
-export default async function AdminGate({ children, next = "/account" }) {
+export default async function AdminGate({ children, next = "/en/account" }) {
   let current = null;
   try {
     current = await getCurrentUser();
@@ -19,12 +19,12 @@ export default async function AdminGate({ children, next = "/account" }) {
     );
   }
 
-  if (!current) redirect(`/auth/sign-in?next=${encodeURIComponent(next)}`);
+  if (!current) redirect(`/en/auth/sign-in?next=${encodeURIComponent(next)}`);
 
   if (!current.isAdmin) {
     return (
       <p className="state-message state-error" role="alert">
-        You don&rsquo;t have access to this page. <Link href="/opportunities">Back to opportunities</Link>
+        You don&rsquo;t have access to this page. <Link href="/en/opportunities">Back to opportunities</Link>
       </p>
     );
   }

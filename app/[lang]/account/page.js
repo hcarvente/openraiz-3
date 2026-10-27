@@ -4,13 +4,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CompleteProfileForm } from "@/components/auth/AuthForms";
 import { getCurrentUser } from "@/lib/roles";
-import { signOutAction } from "@/app/auth/actions";
+import { signOutAction } from "@/app/[lang]/auth/actions";
+import { localePath } from "@/lib/i18n/config";
 
 export const metadata = { title: "Your account | OpenRaiz" };
 
 const ROLE_LABELS = { individual: "Individual", organization: "Organization" };
 
-async function AccountContent() {
+async function AccountContent({ lang }) {
   let current;
   try {
     current = await getCurrentUser();
@@ -22,7 +23,7 @@ async function AccountContent() {
       </p>
     );
   }
-  if (!current) redirect("/auth/sign-in?next=%2Faccount");
+  if (!current) redirect(`${localePath(lang, "/auth/sign-in")}?next=${encodeURIComponent(localePath(lang, "/account"))}`);
   const { user, profile, isVerified, isAdmin } = current;
 
   return (
@@ -44,7 +45,7 @@ async function AccountContent() {
 
       {!isVerified ? (
         <p className="form-notice" role="status">
-          Verify your email to be able to post. <Link href={`/auth/verify?email=${encodeURIComponent(user.email)}`}>Enter your code</Link>
+          Verify your email to be able to post. <Link href={`${localePath(lang, "/auth/verify")}?email=${encodeURIComponent(user.email)}`}>Enter your code</Link>
         </p>
       ) : null}
 
@@ -64,6 +65,7 @@ async function AccountContent() {
       ) : null}
 
       <form action={signOutAction}>
+        <input type="hidden" name="lang" value={lang} />
         <button className="button button-secondary" type="submit">
           Sign out
         </button>
@@ -72,13 +74,14 @@ async function AccountContent() {
   );
 }
 
-export default function AccountPage() {
+export default async function AccountPage({ params }) {
+  const { lang } = await params;
   return (
     <>
       <main id="main-content" tabIndex={-1} className="page-main auth-page">
         <h1>Your account</h1>
         <Suspense fallback={<p className="state-message">Loading your account&hellip;</p>}>
-          <AccountContent />
+          <AccountContent lang={lang} />
         </Suspense>
       </main>
     </>

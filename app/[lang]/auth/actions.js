@@ -8,12 +8,16 @@ import { auth } from "@/lib/auth/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/roles";
 import { validateProfileChoice, validateSignUp } from "@/lib/rolesCore";
+import { DEFAULT_LOCALE, isLocale, localePath } from "@/lib/i18n/config";
 import { safeNextPath } from "@/lib/safeRedirect";
 
 const text = (formData, name) => (typeof formData.get(name) === "string" ? formData.get(name) : "");
+// The forms send their language in a hidden field; anything else means English.
+const langOf = (formData) => (isLocale(text(formData, "lang")) ? text(formData, "lang") : DEFAULT_LOCALE);
 const UNAVAILABLE = "Sign-in is unavailable right now. Please try again in a moment.";
 
 export async function signUpAction(_previous, formData) {
+  const lang = langOf(formData);
   const raw = {
     name: text(formData, "name"),
     email: text(formData, "email"),
@@ -46,10 +50,11 @@ export async function signUpAction(_previous, formData) {
     console.error("Profile was not saved after sign-up:", error?.name, error?.code);
   }
 
-  redirect(`/auth/verify?email=${encodeURIComponent(email)}`);
+  redirect(`${localePath(lang, "/auth/verify")}?email=${encodeURIComponent(email)}`);
 }
 
 export async function verifyAction(_previous, formData) {
+  const lang = langOf(formData);
   const email = text(formData, "email").trim().toLowerCase();
   const otp = text(formData, "otp").trim();
   if (!email || !/^[A-Za-z0-9]{4,12}$/.test(otp)) {
@@ -63,7 +68,7 @@ export async function verifyAction(_previous, formData) {
     console.error("Verification failed:", error?.name, error?.code);
     return { message: UNAVAILABLE, values: { email } };
   }
-  redirect("/auth/sign-in?verified=1");
+  redirect(`${localePath(lang, "/auth/sign-in")}?verified=1`);
 }
 
 export async function resendCodeAction(_previous, formData) {
@@ -79,9 +84,10 @@ export async function resendCodeAction(_previous, formData) {
 }
 
 export async function signInAction(_previous, formData) {
+  const lang = langOf(formData);
   const email = text(formData, "email").trim().toLowerCase();
   const password = text(formData, "password");
-  const next = safeNextPath(text(formData, "next"));
+  const next = safeNextPath(text(formData, "next"), localePath(lang, "/account"));
   if (!email || !password) return { message: "Enter your email and password.", values: { email } };
 
   let error;
@@ -93,27 +99,29 @@ export async function signInAction(_previous, formData) {
   }
 
   if (error) {
-    if (error.code === "EMAIL_NOT_VERIFIED") redirect(`/auth/verify?email=${encodeURIComponent(email)}`);
+    if (error.code === "EMAIL_NOT_VERIFIED") redirect(`${localePath(lang, "/auth/verify")}?email=${encodeURIComponent(email)}`);
     return { message: "The email or password is not right.", values: { email } };
   }
   redirect(next);
 }
 
-export async function signOutAction() {
+export async function signOutAction(formData) {
+  const lang = langOf(formData);
   try {
     await auth.signOut();
   } catch (error) {
     console.error("Sign-out failed:", error?.name, error?.code);
   }
-  redirect("/");
+  redirect(localePath(lang));
 }
 
 // For an account whose profile was never saved (see signUpAction): pick the role now.
 export async function completeProfileAction(_previous, formData) {
+  const lang = langOf(formData);
   const values = { role: text(formData, "role"), orgName: text(formData, "orgName") };
   const current = await getCurrentUser();
-  if (!current) redirect("/auth/sign-in?next=%2Faccount");
-  if (current.profile) redirect("/account");
+  if (!current) redirect(`${localePath(lang, "/auth/sign-in")}?next=${encodeURIComponent(localePath(lang, "/account"))}`);
+  if (current.profile) redirect(localePath(lang, "/account"));
 
   const choice = validateProfileChoice(values);
   if (Object.keys(choice.errors).length > 0) return { errors: choice.errors, values };
@@ -126,5 +134,5 @@ export async function completeProfileAction(_previous, formData) {
     console.error("Profile was not saved:", error?.name, error?.code);
     return { message: "We couldn't save your profile. Please try again.", values };
   }
-  redirect("/account");
+  redirect(localePath(lang, "/account"));
 }
