@@ -993,3 +993,56 @@ main:focus {
   margin: 0;
   overflow-wrap: anywhere;
 }
+
+/* ---------- Search and filters on the opportunities list ---------- */
+.search-form {
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem 1.25rem;
+  background: #fff;
+  border: 1px solid #e5ded2;
+  border-radius: 1rem;
+}
+
+.search-form .field label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.search-form input[type="search"],
+.search-form select {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid #d9d0c0;
+  border-radius: 8px;
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.85rem 1rem;
+  margin-top: 0.85rem;
+}
+
+.search-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 1rem;
+}
+
+.check-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-right: auto;
+  font-size: 0.95rem;
+  cursor: pointer;
+}

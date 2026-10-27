@@ -213,9 +213,7 @@ async function Detail({ params }) {
               </Row>
             ) : null}
             {o.category ? (
-              <Row label={d.category}>
-                <span lang={CONTENT_LANG}>{o.category}</span>
-              </Row>
+              <Row label={d.category}>{dictionary.categories[o.category] ?? o.category}</Row>
             ) : null}
             <Row label={d.status}>{card.statuses[o.status] ?? o.status}</Row>
             <Row label={d.posted}>
