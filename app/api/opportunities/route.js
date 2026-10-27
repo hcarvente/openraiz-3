@@ -2,9 +2,9 @@
 // POST /api/opportunities: validates a flat JSON body and creates one opportunity.
 // All database access and validation happen here on the server; the browser only sees JSON.
 //
-// SECURITY: there is no authentication yet, so POST is for LOCAL DEVELOPMENT ONLY.
-// Do not deploy this route publicly until sign-in and authorization checks exist.
+// SECURITY: GET is public. POST is admin only (requireAdminApi: 401 if not signed in, 403 if not admin).
 import { prisma } from "@/lib/prisma";
+import { requireAdminApi } from "@/lib/roles";
 import { serializeOpportunity } from "@/lib/serializeOpportunity";
 import { validateOpportunity } from "@/lib/validateOpportunity";
 
@@ -23,6 +23,9 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  const denied = await requireAdminApi();
+  if (denied) return denied;
+
   // 1. Read the JSON body. Malformed or empty JSON is the client's mistake: 400.
   let body;
   try {

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseAdminEmails, isAdminEmail, validateSignUp } from "../lib/rolesCore.js";
+import { parseAdminEmails, isAdminEmail, validateSignUp, validateProfileChoice } from "../lib/rolesCore.js";
 
 test("parseAdminEmails trims, lower-cases and drops blanks", () => {
   assert.deepEqual(parseAdminEmails(" A@x.com, b@Y.com ,, "), ["a@x.com", "b@y.com"]);
@@ -59,4 +59,12 @@ test("bad names, emails and passwords are rejected with a message per field", ()
   assert.equal(validateSignUp({ ...good, password: "x".repeat(129) }).ok, false);
   assert.equal(validateSignUp(null).ok, false);
   assert.equal(validateSignUp({ ...good, name: { $ne: 1 } }).ok, false);
+});
+
+test("finishing a profile accepts only the two roles and keeps the organization name only for organizations", () => {
+  assert.deepEqual(validateProfileChoice({ role: "individual", orgName: "x" }), { errors: {}, role: "individual", orgName: null });
+  assert.equal(validateProfileChoice({ role: "organization", orgName: " Raiz " }).orgName, "Raiz");
+  assert.ok(validateProfileChoice({ role: "organization", orgName: "" }).errors.orgName);
+  assert.ok(validateProfileChoice({ role: "admin" }).errors.role);
+  assert.ok(validateProfileChoice(undefined).errors.role);
 });

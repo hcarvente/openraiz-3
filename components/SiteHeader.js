@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import Link from "next/link";
+import AuthLinks from "@/components/AuthLinks";
 
 // Logo-only header: the OpenRaiz sprout mark plus wordmark.
 // The sprout is ported from the original site's header (a stem, two leaves,
@@ -29,6 +31,11 @@ export default function SiteHeader() {
         </svg>
         OpenRaiz
       </Link>
+      <nav className="site-nav" aria-label="Account">
+        <Suspense fallback={null}>
+          <AuthLinks />
+        </Suspense>
+      </nav>
     </header>
   );
 }

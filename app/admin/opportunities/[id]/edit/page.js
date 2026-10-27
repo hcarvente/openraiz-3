@@ -1,11 +1,10 @@
 // The "Edit Opportunity" page for /admin/opportunities/[id]/edit. This file is a Server Component: it runs
 // on the server, reads the opportunity through Prisma, and hands it to the form (a Client Component).
-//
-// LOCAL DEVELOPMENT ONLY: there is no sign-in yet, so this page and PATCH /api/opportunities/[id]
-// must not be deployed publicly until authentication and authorization exist.
+// Admin only: <AdminGate> renders the page's content only for a signed-in admin. PATCH /api/opportunities/[id] checks again.
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import AdminGate from "@/components/AdminGate";
 import SiteHeader from "@/components/SiteHeader";
 import OpportunityForm from "@/components/OpportunityForm";
 import { prisma } from "@/lib/prisma";
@@ -53,9 +52,6 @@ async function EditOpportunity({ params }) {
       <p className="page-intro">
         Editing <strong>{saved.title}</strong>
       </p>
-      <p className="notice-local" role="note">
-        <strong>Local development only.</strong> This form has no sign-in yet, so it must not be deployed publicly.
-      </p>
       <OpportunityForm mode="edit" opportunityId={saved.id} initialValues={valuesFromOpportunity(saved)} />
     </>
   );
@@ -70,7 +66,9 @@ export default function EditOpportunityPage({ params }) {
           <Link href="/">&larr; Back to opportunities</Link>
         </p>
         <Suspense fallback={<p className="state-message">Loading opportunity&hellip;</p>}>
-          <EditOpportunity params={params} />
+          <AdminGate>
+            <EditOpportunity params={params} />
+          </AdminGate>
         </Suspense>
       </main>
     </>

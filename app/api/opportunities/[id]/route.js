@@ -4,9 +4,9 @@
 // The [id] in the folder name is a dynamic segment: for /api/opportunities/abc123 the id is "abc123".
 // All database access and validation happen here on the server.
 //
-// SECURITY: there is no authentication yet, so PATCH and DELETE are for LOCAL DEVELOPMENT ONLY.
-// Do not deploy this route publicly until sign-in and authorization checks exist.
+// SECURITY: GET is public. PATCH and DELETE are admin only (requireAdminApi: 401 if not signed in, 403 if not admin).
 import { prisma } from "@/lib/prisma";
+import { requireAdminApi } from "@/lib/roles";
 import { serializeOpportunity } from "@/lib/serializeOpportunity";
 import { validateOpportunityUpdate } from "@/lib/validateOpportunityUpdate";
 
@@ -40,6 +40,9 @@ export async function GET(_request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
+  const denied = await requireAdminApi();
+  if (denied) return denied;
+
   const { id } = await params;
 
   if (!VALID_ID.test(id)) {
@@ -82,6 +85,9 @@ export async function PATCH(request, { params }) {
 }
 
 export async function DELETE(_request, { params }) {
+  const denied = await requireAdminApi();
+  if (denied) return denied;
+
   const { id } = await params;
 
   if (!VALID_ID.test(id)) {

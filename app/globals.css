@@ -615,3 +615,73 @@ body {
   background: var(--color-nav-bg);
   border-color: #e5ded2;
 }
+
+/* ---------- Header navigation and the sign-in / account pages ---------- */
+.site-nav {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.6rem;
+  min-height: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.site-nav a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.auth-page {
+  max-width: 28rem;
+}
+
+.auth-form {
+  display: grid;
+  gap: 1rem;
+  margin: 0 0 1.25rem;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"] {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid #d9d0c0;
+  border-radius: 8px;
+}
+
+.auth-form input:focus-visible,
+.site-nav a:focus-visible {
+  outline: 3px solid rgba(46, 111, 78, 0.45);
+  outline-offset: 1px;
+}
+
+.auth-secondary {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #E5DED2;
+}
+
+.auth-alt {
+  color: var(--color-muted);
+}
+
+.account-details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1rem;
+  margin: 0 0 1.25rem;
+}
+
+.account-details dt {
+  font-weight: 600;
+}
+
+.account-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
