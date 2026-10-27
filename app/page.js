@@ -1,70 +1,41 @@
-// The homepage. Everything in this file is a Server Component: it runs on the server,
-// reads the database through Prisma, and sends finished HTML to the browser.
-import { Suspense } from "react";
-import SiteHeader from "@/components/SiteHeader";
-import OpportunityCard from "@/components/OpportunityCard";
-import DeletedNotice from "@/components/DeletedNotice";
-import { prisma } from "@/lib/prisma";
-import { serializePublicOpportunity } from "@/lib/serializeOpportunity";
-import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
+// The landing page ("About"): the mission, then a button into the opportunities list. It reads nothing from the
+// database, so only the header's sign-in links are worked out per visitor.
+import Image from "next/image";
+import Link from "next/link";
 
-// Reads the opportunities and renders the list, or an empty or error message.
-// With Cache Components enabled, an uncached database read must sit inside <Suspense> (see Home below).
-async function OpportunityList() {
-  let opportunities;
-  try {
-    const rows = await prisma.opportunity.findMany({
-      where: PUBLIC_WHERE, // only approved, non-archived listings
-      orderBy: [{ datePosted: "desc" }, { id: "asc" }], // same order as GET /api/opportunities
-    });
-    opportunities = rows.map(serializePublicOpportunity); // dates become "YYYY-MM-DD" strings
-  } catch (error) {
-    // Log only the error's name and code on the server; the visitor sees a plain message.
-    console.error("Homepage could not load opportunities:", error?.name, error?.code);
-    return (
-      <p className="state-message state-error" role="alert">
-        We couldn&rsquo;t load opportunities right now. Please try again in a moment.
-      </p>
-    );
-  }
-
-  if (opportunities.length === 0) {
-    return <p className="state-message">No opportunities have been added yet. Please check back soon.</p>;
-  }
-
-  const today = new Date().toISOString().slice(0, 10); // today's date in UTC, "YYYY-MM-DD"
-  const count = opportunities.length;
-
+export default function LandingPage() {
   return (
-    <>
-      <p className="result-count">
-        {count} {count === 1 ? "opportunity" : "opportunities"} found
-      </p>
-      <ul className="opportunity-list">
-        {opportunities.map((opportunity) => (
-          <li key={opportunity.id}>
-            <OpportunityCard opportunity={opportunity} today={today} />
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-}
-
-export default function Home() {
-  return (
-    <>
-      <SiteHeader />
-      <main className="page-main">
-        <div className="page-title-row">
-          <h1>Opportunities</h1>
+    <div className="landing-background">
+      {/* Phone-sized screens crop the wide photo badly as a page background, so they get this band instead (see globals.css). */}
+      <Image className="about-hero-image" src="/OpenRaiz_About.jpg" alt="" width={1671} height={941} priority />
+      <main id="main-content" tabIndex={-1} className="about">
+        <div className="about-card">
+          <h1>You belong here because of what you bring.</h1>
+          <p>
+            OpenRaiz connects young adults whose lived experience with systems &mdash; justice, immigration, foster
+            care, housing instability, and others &mdash; has too often created barriers to opportunity, with
+            organizations that recognize that experience as expertise, not a deficit.
+          </p>
+          <p>
+            Government agencies, nonprofits, philanthropy, and other mission-aligned employers list jobs, fellowships,
+            internships, and volunteer roles here &mdash; opportunities that specifically welcome, prefer, or require
+            the perspective you carry.
+          </p>
+          <p>
+            Organizations and individuals can also share workshops, events, resources and opportunities here.
+          </p>
+          <p>
+            You don&rsquo;t have to disclose anything about your history to browse. Every listing tells you how it
+            relates to lived experience; nothing here asks you to prove yours.
+          </p>
+          <Link className="about-cta" href="/opportunities">
+            Browse opportunities
+          </Link>
+          <p className="about-incubated">
+            Incubated by Alianza for Opportunity &mdash; OpenRaiz is its own standalone project.
+          </p>
         </div>
-        <p className="page-intro">Explore jobs, internships, fellowships, and volunteer opportunities.</p>
-        <DeletedNotice />
-        <Suspense fallback={<p className="state-message">Loading opportunities&hellip;</p>}>
-          <OpportunityList />
-        </Suspense>
       </main>
-    </>
+    </div>
   );
 }

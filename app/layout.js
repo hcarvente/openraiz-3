@@ -1,4 +1,6 @@
 import "./globals.css";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 
 export const metadata = {
   title: "OpenRaiz",
@@ -16,7 +18,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {/* First thing a keyboard user reaches: jumps past the header to the page's <main id="main-content"> */}
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
+        <SiteHeader />
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   );
 }

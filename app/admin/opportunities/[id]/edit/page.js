@@ -5,7 +5,6 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AdminGate from "@/components/AdminGate";
-import SiteHeader from "@/components/SiteHeader";
 import OpportunityForm from "@/components/OpportunityForm";
 import { prisma } from "@/lib/prisma";
 import { serializeOpportunity } from "@/lib/serializeOpportunity";
@@ -60,10 +59,9 @@ async function EditOpportunity({ params }) {
 export default function EditOpportunityPage({ params }) {
   return (
     <>
-      <SiteHeader />
-      <main className="page-main">
+      <main id="main-content" tabIndex={-1} className="page-main">
         <p className="back-link">
-          <Link href="/">&larr; Back to opportunities</Link>
+          <Link href="/opportunities">&larr; Back to opportunities</Link>
         </p>
         <Suspense fallback={<p className="state-message">Loading opportunity&hellip;</p>}>
           <AdminGate>

@@ -24,7 +24,7 @@ export default async function AdminGate({ children, next = "/account" }) {
   if (!current.isAdmin) {
     return (
       <p className="state-message state-error" role="alert">
-        You don&rsquo;t have access to this page. <Link href="/">Back to opportunities</Link>
+        You don&rsquo;t have access to this page. <Link href="/opportunities">Back to opportunities</Link>
       </p>
     );
   }

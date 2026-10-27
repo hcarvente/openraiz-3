@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import SiteHeader from "@/components/SiteHeader";
 import { SignInForm } from "@/components/auth/AuthForms";
 import { safeNextPath } from "@/lib/safeRedirect";
 
@@ -24,8 +23,7 @@ async function SignInContent({ searchParams }) {
 export default function SignInPage({ searchParams }) {
   return (
     <>
-      <SiteHeader />
-      <main className="page-main auth-page">
+      <main id="main-content" tabIndex={-1} className="page-main auth-page">
         <h1>Sign in</h1>
         <Suspense fallback={<p className="state-message">Loading&hellip;</p>}>
           <SignInContent searchParams={searchParams} />

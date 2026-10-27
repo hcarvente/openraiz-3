@@ -70,7 +70,7 @@ function Field({ name, label, required, hint, error, wide, children }) {
 const subscribeToNothing = () => () => {};
 const getServerToday = () => "";
 
-export default function OpportunityForm({ mode = "create", opportunityId, initialValues, submitLabel, successRedirectTo = "/" }) {
+export default function OpportunityForm({ mode = "create", opportunityId, initialValues, submitLabel, successRedirectTo = "/opportunities" }) {
   const isEdit = mode === "edit";
   const buttonLabel = submitLabel ?? (isEdit ? "Save Changes" : "Save Opportunity");
   const [values, setValues] = useState(() => ({ ...emptyOpportunityValues(), ...initialValues }));

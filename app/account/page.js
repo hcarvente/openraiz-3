@@ -2,7 +2,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import SiteHeader from "@/components/SiteHeader";
 import { CompleteProfileForm } from "@/components/auth/AuthForms";
 import { getCurrentUser } from "@/lib/roles";
 import { signOutAction } from "@/app/auth/actions";
@@ -76,8 +75,7 @@ async function AccountContent() {
 export default function AccountPage() {
   return (
     <>
-      <SiteHeader />
-      <main className="page-main auth-page">
+      <main id="main-content" tabIndex={-1} className="page-main auth-page">
         <h1>Your account</h1>
         <Suspense fallback={<p className="state-message">Loading your account&hellip;</p>}>
           <AccountContent />
