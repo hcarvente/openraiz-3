@@ -6,8 +6,8 @@
 // with calendar dates as "YYYY-MM-DD" strings. `today` is also "YYYY-MM-DD"; it is passed
 // in (not read from the clock here) so the card always renders the same output for the same props.
 //
-// `showAdminActions` adds the Edit link and the Delete button. There is no sign-in yet, so it is off by default; the
-// homepage turns it on for the local development demo. Leave it off (or guard it) wherever the cards are shown to the public.
+// `showAdminActions` adds the Edit link and the Delete button. It is off by default and no public page turns it on:
+// the admin routes and write APIs are locked (proxy.js), and a signed-in admin view will turn it on later.
 import Link from "next/link";
 import DeleteOpportunityButton from "@/components/DeleteOpportunityButton";
 

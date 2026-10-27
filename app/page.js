@@ -1,7 +1,6 @@
 // The homepage. Everything in this file is a Server Component: it runs on the server,
 // reads the database through Prisma, and sends finished HTML to the browser.
 import { Suspense } from "react";
-import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import OpportunityCard from "@/components/OpportunityCard";
 import DeletedNotice from "@/components/DeletedNotice";
@@ -42,9 +41,7 @@ async function OpportunityList() {
       <ul className="opportunity-list">
         {opportunities.map((opportunity) => (
           <li key={opportunity.id}>
-            {/* showAdminActions shows the Edit link. It is on for the local development demo only: remove it, or
-                restrict it to signed-in administrators, before the directory is shown to the public. */}
-            <OpportunityCard opportunity={opportunity} today={today} showAdminActions />
+            <OpportunityCard opportunity={opportunity} today={today} />
           </li>
         ))}
       </ul>
@@ -59,9 +56,6 @@ export default function Home() {
       <main className="page-main">
         <div className="page-title-row">
           <h1>Opportunities</h1>
-          <Link className="button button-primary" href="/admin/opportunities/new">
-            Add Opportunity
-          </Link>
         </div>
         <p className="page-intro">Explore jobs, internships, fellowships, and volunteer opportunities.</p>
         <DeletedNotice />

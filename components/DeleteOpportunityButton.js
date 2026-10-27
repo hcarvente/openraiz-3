@@ -4,7 +4,8 @@
 // keys in the browser. Nothing is sent when Delete is first clicked: only "Yes, delete" sends
 // DELETE /api/opportunities/[id]. The steps themselves live in lib/deleteFlow.js.
 //
-// LOCAL DEVELOPMENT ONLY: there is no sign-in yet. The cards show this button only when showAdminActions is on.
+// The cards show this button only when showAdminActions is on, which no public page does. The DELETE request itself
+// is refused without admin credentials (proxy.js).
 import { useEffect, useId, useReducer, useRef } from "react";
 import { deleteReducer, initialDeleteState, interpretDeleteStatus, rememberDeletion } from "@/lib/deleteFlow";
 

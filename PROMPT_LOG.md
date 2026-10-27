@@ -3462,3 +3462,18 @@ Plan: `~/.claude/plans/pasted-content-id-cefb-openraiz-week-delegated-sunbeam.md
 - **Changes:** `package.json` and `package-lock.json` renamed to `openraiz-3`; `"postinstall": "prisma generate"` added; `prisma.config.ts` no longer throws when `DIRECT_URL` is unset (it falls back to an unusable placeholder host named `DIRECT_URL-is-not-set.invalid`), because `prisma generate` ran during install and failed without env vars; `.env.example` gained placeholders for `ADMIN_EMAILS`, `GEMINI_API_KEY` and `AI_ENABLED`.
 - **Tests (Claude-verified):** a fresh folder with only the package files, config and `prisma/`, installed with `DIRECT_URL` and `DATABASE_URL` unset, ran `postinstall` and produced `generated/prisma`; before the config fix the same install failed with `Cannot resolve environment variable: DIRECT_URL`. `npm run lint` and `npm run build` pass in the project.
 - **Known limit:** migrate commands without `DIRECT_URL` now fail with `P1001: Can't reach database server at DIRECT_URL-is-not-set.invalid` instead of the old explicit message.
+
+## Step 2 — Interim admin lock; hide admin actions (awaiting the user's commit approval)
+
+- **Date:** 2026-10-27
+- **Scope change recorded:** the user needs **individuals and organizations posting by Thursday**, not after the gate as plan v2 assumed. Plan v2 is being revised; Step 2 is unaffected (it closes the open write endpoints either way).
+- **Changes:** new `proxy.js` (Next 16 Proxy, Node runtime): HTTP Basic Auth on every `/admin/*` request and on every non-`GET`/`HEAD`/`OPTIONS` request to `/api/opportunities*`, credentials from `ADMIN_USER` and `ADMIN_PASSWORD` (timing-safe comparison); if either is unset, protected routes return 503, never open. The homepage no longer passes `showAdminActions` and the "Add Opportunity" button is removed (option A, chosen by the user); stale "local development only" comments updated; `.env.example` gained the two placeholders.
+- **Tests (Claude-verified; real `next dev` servers and `curl`, throwaway credentials passed on the command line, no database writes):**
+  - No credentials: POST, PATCH, DELETE and `/admin/*` pages return 401. A wrong password, a wrong user, a malformed header (`Basic !!!`), a `Bearer` header and empty credentials all return 401.
+  - Public reads stay open: `GET /api/opportunities` 200, `GET /` 200, `GET /api/opportunities/x` 404 (unknown id).
+  - Correct credentials: `POST {}` 400 (past the lock, rejected by validation), PATCH and DELETE on an unknown id 404 (nothing written), `/admin/opportunities/new` 200.
+  - With `ADMIN_USER` and `ADMIN_PASSWORD` unset: POST (with and without guessed credentials) and `/admin/*` return 503; public GET stays 200.
+  - `npm run lint` and `npm run build` pass.
+- **Not verified:** that the Edit and Delete buttons are hidden **on a rendered card**. The `week7-dev` database has 0 rows, so the homepage rendered no cards and the check was vacuous; the code change (no `showAdminActions` prop) is what guarantees it, and it should be re-checked after Step 6 seeds listings. Also not observed in a browser: whether the Add and Edit forms' `fetch` calls reuse the login typed for `/admin`.
+- **Known limits:** Basic Auth sends the password with every request (acceptable on localhost and HTTPS only); no rate limiting on login attempts; no Edit or Delete button is reachable until the admin dashboard exists (Step 12), so edit pages are reached by typing `/admin/opportunities/<id>/edit`.
+- **Step 1 commit reference:** `3b176a8` (Prepare branch and deploy-safe build), pushed to `origin/week7-integration`.
