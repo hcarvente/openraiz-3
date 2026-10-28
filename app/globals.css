@@ -1046,3 +1046,28 @@ main:focus {
   font-size: 0.95rem;
   cursor: pointer;
 }
+
+/* ---------- Posting form ---------- */
+.form-more {
+  margin: 0 0 1.5rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e5ded2;
+  border-radius: 12px;
+}
+
+.form-more summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.form-more .form-grid {
+  margin-top: 1rem;
+}
+
+.guidelines ul {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+  line-height: 1.5;
+}

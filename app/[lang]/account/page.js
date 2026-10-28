@@ -13,9 +13,10 @@ export async function generateMetadata({ params }) {
   return { title: getDictionary(lang).meta.titles.account };
 }
 
-async function AccountContent({ lang }) {
+async function AccountContent({ lang, searchParams }) {
   const t = getDictionary(lang).account;
   const signUpCopy = getDictionary(lang).auth.signUp;
+  const { posted } = await searchParams;
   let current;
   try {
     current = await getCurrentUser();
@@ -33,6 +34,11 @@ async function AccountContent({ lang }) {
 
   return (
     <>
+      {posted ? (
+        <p className="form-notice" role="status">
+          {getDictionary(lang).post.successBanner}
+        </p>
+      ) : null}
       <dl className="account-details">
         <dt>{t.name}</dt>
         <dd>{profile?.displayName ?? user.name}</dd>
@@ -62,6 +68,14 @@ async function AccountContent({ lang }) {
         </section>
       ) : null}
 
+      {isVerified && profile ? (
+        <p>
+          <Link className="button button-primary" href={localePath(lang, "/post")}>
+            {t.postOpportunity}
+          </Link>
+        </p>
+      ) : null}
+
       {isAdmin ? (
         <p>
           <Link className="button button-secondary" href="/admin/opportunities/new">
@@ -80,7 +94,7 @@ async function AccountContent({ lang }) {
   );
 }
 
-export default async function AccountPage({ params }) {
+export default async function AccountPage({ params, searchParams }) {
   const { lang } = await params;
   const t = getDictionary(lang).account;
   return (
@@ -88,7 +102,7 @@ export default async function AccountPage({ params }) {
       <main id="main-content" tabIndex={-1} className="page-main auth-page">
         <h1>{t.heading}</h1>
         <Suspense fallback={<p className="state-message">{t.loading}</p>}>
-          <AccountContent lang={lang} />
+          <AccountContent lang={lang} searchParams={searchParams} />
         </Suspense>
       </main>
     </>

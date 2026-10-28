@@ -6,6 +6,7 @@
 // With Cache Components, reading searchParams and the database must happen inside <Suspense> (see the page below).
 import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 import OpportunityCard from "@/components/OpportunityCard";
 import DeletedNotice from "@/components/DeletedNotice";
 import { prisma } from "@/lib/prisma";
@@ -85,6 +86,7 @@ async function OpportunitiesContent({ lang, searchParams }) {
   const dictionary = getDictionary(lang);
   const t = dictionary.opportunities;
   const filters = parseSearchParams(await searchParams);
+  await connection(); // "today" changes, so this page is worked out for each visitor, never ahead of time
   const today = new Date().toISOString().slice(0, 10); // today's date in UTC, "YYYY-MM-DD"
 
   let opportunities;
@@ -129,7 +131,9 @@ async function OpportunitiesContent({ lang, searchParams }) {
   return (
     <>
       <SearchForm lang={lang} filters={filters} states={states} dictionary={dictionary} />
-      {lang === "es" ? <p className="page-note">{t.englishOnly}</p> : null}
+      {opportunities.some((o) => (o.originalLang ?? "en") !== lang) ? (
+        <p className="page-note">{lang === "es" ? t.someOnlyEnglish : t.someOnlySpanish}</p>
+      ) : null}
       {count === 0 ? (
         <div className="state-message" role="status">
           {filtered ? (

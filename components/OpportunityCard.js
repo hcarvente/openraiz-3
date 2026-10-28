@@ -43,6 +43,7 @@ const BriefcaseShapes = (
 
 export default function OpportunityCard({ opportunity, today, lang = "en", showAdminActions = false }) {
   const t = getDictionary(lang).card;
+  const contentLang = opportunity.originalLang ?? "en"; // the language the listing's own text is written in
   const typeLabel = t.types[opportunity.type] ?? opportunity.type;
   const statusLabel = t.statuses[opportunity.status] ?? opportunity.status;
   const relevanceLabel = t.relevance[opportunity.livedExperienceRelevance] ?? opportunity.livedExperienceRelevance;
@@ -64,11 +65,11 @@ export default function OpportunityCard({ opportunity, today, lang = "en", showA
         </span>
         <div className="card-heading">
           <h2 className="card-title">
-            <Link href={localePath(lang, `/opportunities/${opportunity.id}`)} lang="en">
+            <Link href={localePath(lang, `/opportunities/${opportunity.id}`)} lang={contentLang}>
               {opportunity.title}
             </Link>
           </h2>
-          <p className="card-org" lang="en">
+          <p className="card-org" lang={contentLang}>
             {opportunity.organization}
           </p>
         </div>

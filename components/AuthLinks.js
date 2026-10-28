@@ -22,5 +22,10 @@ export default async function AuthLinks({ lang = "en" }) {
       </>
     );
   }
-  return <Link href={localePath(lang, "/account")}>{t.nav.account}</Link>;
+  return (
+    <>
+      <Link href={localePath(lang, "/post")}>{t.nav.post}</Link>
+      <Link href={localePath(lang, "/account")}>{t.nav.account}</Link>
+    </>
+  );
 }

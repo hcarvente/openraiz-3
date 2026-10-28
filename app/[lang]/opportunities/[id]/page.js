@@ -6,6 +6,7 @@
 // draws the frame and everything else happens in <Detail>.
 import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 import { formatDate } from "@/lib/formatDate";
 import { localePath } from "@/lib/i18n/config";
 import { fill, getDictionary } from "@/lib/i18n/dictionaries";
@@ -13,9 +14,6 @@ import { isValidListingId, posterInfo, safeApplyLink } from "@/lib/opportunityDe
 import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
 import { prisma } from "@/lib/prisma";
 import { serializePublicOpportunity } from "@/lib/serializeOpportunity";
-
-// What language the listing's own text is written in. Every listing is English for now; Step 11 adds Spanish text.
-const CONTENT_LANG = "en";
 
 export async function generateMetadata({ params }) {
   const { lang, id } = await params;
@@ -89,8 +87,11 @@ async function Detail({ params }) {
   if (!row) return <ListingNotFound lang={lang} />;
 
   const o = serializePublicOpportunity(row);
+  // The language the listing's own text is written in (set when it was posted). Pages in the other language say so.
+  const CONTENT_LANG = o.originalLang ?? "en";
   const poster = posterInfo(row, profile);
   const apply = safeApplyLink(o.applyMethodType, o.applyMethodValue);
+  await connection(); // "today" changes, so this page is worked out for each visitor, never ahead of time
   const today = new Date().toISOString().slice(0, 10);
   const deadlinePassed = Boolean(o.deadline) && o.deadline < today;
   const place = [o.city, o.state].filter(Boolean).join(", ");
@@ -114,7 +115,7 @@ async function Detail({ params }) {
           <li className={`pill pill-status-${o.status}`}>{card.statuses[o.status] ?? o.status}</li>
           <li className="pill pill-relevance">{fill(card.livedExperience, { level: levelLabel })}</li>
         </ul>
-        {lang !== CONTENT_LANG ? <p className="page-note">{d.englishOnly}</p> : null}
+        {lang !== CONTENT_LANG ? <p className="page-note">{CONTENT_LANG === "es" ? d.spanishOnly : d.englishOnly}</p> : null}
       </header>
 
       <div className="detail-grid">

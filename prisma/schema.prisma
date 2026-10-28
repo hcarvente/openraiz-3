@@ -54,6 +54,14 @@ enum LocationType {
 enum ApplyMethodType {
   url
   email
+  platform // people contact the poster through OpenRaiz (step P4); no link or email is shown
+}
+
+// Where the translated text of a listing stands. Only "approved" translations are shown as normal text.
+enum TranslationStatus {
+  none
+  ai_draft
+  approved
 }
 
 model Opportunity {
@@ -100,6 +108,15 @@ model Opportunity {
   category     String? // one of the categories in lib/opportunityTaxonomy.js
   commitment   String? // for example "4 hours a week"
   eventDate    DateTime? @db.Date // workshops and events only
+
+  // The title, summary, description and requirements above are written in `originalLang` ("en" or "es").
+  // The *Tr columns hold the same text in the other language, once someone has translated it.
+  originalLang      String            @default("en")
+  titleTr           String?
+  summaryTr         String?
+  descriptionTr     String?
+  requirementsTr    String?
+  translationStatus TranslationStatus @default(none)
 
   approvalStatus  ApprovalStatus @default(pending) // safe default: not public until approved
   rejectionReason String?
