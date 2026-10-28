@@ -1158,3 +1158,14 @@ main:focus {
   background: #ece7dc;
   color: var(--color-muted);
 }
+
+/* ---------- Admin review ---------- */
+.guidelines-list {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+  line-height: 1.5;
+}
+
+.review-panel .form-section {
+  margin-top: 1.5rem;
+}

@@ -12,6 +12,7 @@ import DeletedNotice from "@/components/DeletedNotice";
 import { prisma } from "@/lib/prisma";
 import { serializePublicOpportunity } from "@/lib/serializeOpportunity";
 import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
+import { searchableTranslation, translatedView } from "@/lib/translation";
 import { localePath } from "@/lib/i18n/config";
 import { fill, getDictionary } from "@/lib/i18n/dictionaries";
 import { CATEGORIES, OPPORTUNITY_TYPES } from "@/lib/opportunityTaxonomy";
@@ -104,6 +105,7 @@ async function OpportunitiesContent({ lang, searchParams }) {
           dictionary.card.types[row.type],
           getDictionary("en").card.types[row.type],
           dictionary.categories[row.category] ?? "",
+          ...searchableTranslation(row), // the approved translation, if there is one
         ]),
       )
       .map(serializePublicOpportunity); // dates become "YYYY-MM-DD" strings
@@ -131,7 +133,7 @@ async function OpportunitiesContent({ lang, searchParams }) {
   return (
     <>
       <SearchForm lang={lang} filters={filters} states={states} dictionary={dictionary} />
-      {opportunities.some((o) => (o.originalLang ?? "en") !== lang) ? (
+      {opportunities.some((o) => translatedView(o, lang).showNote) ? (
         <p className="page-note">{lang === "es" ? t.someOnlyEnglish : t.someOnlySpanish}</p>
       ) : null}
       {count === 0 ? (

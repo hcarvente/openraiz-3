@@ -13,6 +13,7 @@ import DeleteOpportunityButton from "@/components/DeleteOpportunityButton";
 import { formatDate } from "@/lib/formatDate";
 import { localePath } from "@/lib/i18n/config";
 import { fill, getDictionary } from "@/lib/i18n/dictionaries";
+import { translatedView } from "@/lib/translation";
 
 function Icon({ size = 16, children }) {
   return (
@@ -43,7 +44,7 @@ const BriefcaseShapes = (
 
 export default function OpportunityCard({ opportunity, today, lang = "en", showAdminActions = false }) {
   const t = getDictionary(lang).card;
-  const contentLang = opportunity.originalLang ?? "en"; // the language the listing's own text is written in
+  const view = translatedView(opportunity, lang); // the original, or its approved translation
   const typeLabel = t.types[opportunity.type] ?? opportunity.type;
   const statusLabel = t.statuses[opportunity.status] ?? opportunity.status;
   const relevanceLabel = t.relevance[opportunity.livedExperienceRelevance] ?? opportunity.livedExperienceRelevance;
@@ -65,11 +66,11 @@ export default function OpportunityCard({ opportunity, today, lang = "en", showA
         </span>
         <div className="card-heading">
           <h2 className="card-title">
-            <Link href={localePath(lang, `/opportunities/${opportunity.id}`)} lang={contentLang}>
-              {opportunity.title}
+            <Link href={localePath(lang, `/opportunities/${opportunity.id}`)} lang={view.langs.title}>
+              {view.text.title}
             </Link>
           </h2>
-          <p className="card-org" lang={contentLang}>
+          <p className="card-org" lang={view.original}>
             {opportunity.organization}
           </p>
         </div>

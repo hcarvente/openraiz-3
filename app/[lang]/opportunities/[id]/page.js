@@ -13,6 +13,7 @@ import { fill, getDictionary } from "@/lib/i18n/dictionaries";
 import { isValidListingId, posterInfo, safeApplyLink } from "@/lib/opportunityDetail";
 import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
 import { prisma } from "@/lib/prisma";
+import { translatedView } from "@/lib/translation";
 import { serializePublicOpportunity } from "@/lib/serializeOpportunity";
 
 export async function generateMetadata({ params }) {
@@ -22,10 +23,11 @@ export async function generateMetadata({ params }) {
   try {
     const row = await prisma.opportunity.findFirst({
       where: { id, ...PUBLIC_WHERE },
-      select: { title: true, summary: true, description: true },
+      select: { title: true, summary: true, description: true, originalLang: true, titleTr: true, summaryTr: true, descriptionTr: true, requirementsTr: true, translationStatus: true },
     });
     if (!row) return fallback;
-    return { title: `${row.title} | OpenRaiz`, description: (row.summary ?? row.description).slice(0, 200) };
+    const { text } = translatedView(row, lang); // the page's own language, when a translation is approved
+    return { title: `${text.title} | OpenRaiz`, description: (text.summary ?? text.description).slice(0, 200) };
   } catch {
     return fallback;
   }
@@ -87,8 +89,9 @@ async function Detail({ params }) {
   if (!row) return <ListingNotFound lang={lang} />;
 
   const o = serializePublicOpportunity(row);
-  // The language the listing's own text is written in (set when it was posted). Pages in the other language say so.
-  const CONTENT_LANG = o.originalLang ?? "en";
+  // The words to show: the original, or its approved translation, each marked with the language it is written in.
+  const view = translatedView(o, lang);
+  const CONTENT_LANG = view.original;
   const poster = posterInfo(row, profile);
   const apply = safeApplyLink(o.applyMethodType, o.applyMethodValue);
   await connection(); // "today" changes, so this page is worked out for each visitor, never ahead of time
@@ -106,7 +109,7 @@ async function Detail({ params }) {
       </p>
 
       <header className="detail-header">
-        <h1 lang={CONTENT_LANG}>{o.title}</h1>
+        <h1 lang={view.langs.title}>{view.text.title}</h1>
         <p className="detail-org" lang={CONTENT_LANG}>
           {o.organization}
         </p>
@@ -115,7 +118,7 @@ async function Detail({ params }) {
           <li className={`pill pill-status-${o.status}`}>{card.statuses[o.status] ?? o.status}</li>
           <li className="pill pill-relevance">{fill(card.livedExperience, { level: levelLabel })}</li>
         </ul>
-        {lang !== CONTENT_LANG ? <p className="page-note">{CONTENT_LANG === "es" ? d.spanishOnly : d.englishOnly}</p> : null}
+        {view.showNote ? <p className="page-note">{CONTENT_LANG === "es" ? d.spanishOnly : d.englishOnly}</p> : null}
       </header>
 
       <div className="detail-grid">
@@ -136,24 +139,24 @@ async function Detail({ params }) {
             </p>
           ) : null}
 
-          {o.summary ? (
-            <p className="detail-summary" lang={CONTENT_LANG}>
-              {o.summary}
+          {view.text.summary ? (
+            <p className="detail-summary" lang={view.langs.summary}>
+              {view.text.summary}
             </p>
           ) : null}
 
           <section aria-labelledby="about">
             <h2 id="about">{d.about}</h2>
-            <div className="detail-text" lang={CONTENT_LANG}>
-              {o.description}
+            <div className="detail-text" lang={view.langs.description}>
+              {view.text.description}
             </div>
           </section>
 
-          {o.requirements ? (
+          {view.text.requirements ? (
             <section aria-labelledby="requirements">
               <h2 id="requirements">{d.requirements}</h2>
-              <div className="detail-text" lang={CONTENT_LANG}>
-                {o.requirements}
+              <div className="detail-text" lang={view.langs.requirements}>
+                {view.text.requirements}
               </div>
             </section>
           ) : null}

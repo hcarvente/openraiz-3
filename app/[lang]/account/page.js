@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CompleteProfileForm } from "@/components/auth/AuthForms";
 import { getCurrentUser } from "@/lib/roles";
+import { prisma } from "@/lib/prisma";
 import { signOutAction } from "@/app/[lang]/auth/actions";
 import { localePath } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -18,8 +19,12 @@ async function AccountContent({ lang, searchParams }) {
   const signUpCopy = getDictionary(lang).auth.signUp;
   const { posted } = await searchParams;
   let current;
+  let queueCount = 0;
   try {
     current = await getCurrentUser();
+    if (current?.isAdmin) {
+      queueCount = await prisma.opportunity.count({ where: { approvalStatus: "pending", status: { not: "archived" } } });
+    }
   } catch (error) {
     console.error("Account page could not load:", error?.name, error?.code);
     return (
@@ -86,6 +91,9 @@ async function AccountContent({ lang, searchParams }) {
 
       {isAdmin ? (
         <p>
+          <Link className="button button-primary" href="/admin/queue">
+            Review queue ({queueCount})
+          </Link>{" "}
           <Link className="button button-secondary" href="/admin/opportunities/new">
             {t.addOpportunity}
           </Link>
