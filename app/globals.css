@@ -1169,3 +1169,37 @@ main:focus {
 .review-panel .form-section {
   margin-top: 1.5rem;
 }
+
+/* ---------- Contact the poster, and the poster's inbox ---------- */
+.contact-form {
+  margin-top: 0.75rem;
+}
+
+.inbox {
+  margin-top: 0.85rem;
+}
+
+.inbox summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.inbox-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.inbox-list li {
+  padding: 0.75rem 1rem;
+  background: #faf7f2;
+  border: 1px solid #e5ded2;
+  border-radius: 10px;
+}
+
+.inbox-from {
+  margin: 0 0 0.4rem;
+}

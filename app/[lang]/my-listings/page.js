@@ -24,11 +24,19 @@ async function MyListings({ lang, searchParams }) {
     <PosterGate lang={lang} path="/my-listings">
       {async (current) => {
         let rows;
+        let messagesByListing = new Map();
         try {
           rows = await prisma.opportunity.findMany({
             where: { ownerUserId: current.user.id, source: "user-posted" }, // only what this person posted
             orderBy: [{ createdAt: "desc" }, { id: "asc" }],
           });
+          // The messages people sent to these listings, newest first.
+          const found = await prisma.contactMessage.findMany({
+            where: { opportunityId: { in: rows.map((r) => r.id) } },
+            orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+          });
+          messagesByListing = new Map();
+          for (const m of found) messagesByListing.set(m.opportunityId, [...(messagesByListing.get(m.opportunityId) ?? []), m]);
         } catch (error) {
           console.error("My listings could not load:", error?.name, error?.code);
           return (
@@ -84,6 +92,32 @@ async function MyListings({ lang, searchParams }) {
                         <p className="my-listing-reason">
                           <strong>{t.reasonLabel}</strong> <span lang={lang}>{row.rejectionReason}</span>
                         </p>
+                      ) : null}
+                      {(messagesByListing.get(row.id) ?? []).length > 0 || row.applyMethodType === "platform" ? (
+                        <details className="inbox">
+                          <summary>{fill(t.messages, { count: (messagesByListing.get(row.id) ?? []).length })}</summary>
+                          {(messagesByListing.get(row.id) ?? []).length === 0 ? (
+                            <p>{t.noMessages}</p>
+                          ) : (
+                            <>
+                              <p className="page-note">{t.inboxNote}</p>
+                              <ul className="inbox-list">
+                                {messagesByListing.get(row.id).map((m) => (
+                                  <li key={m.id}>
+                                    <p className="inbox-from">
+                                      <strong>
+                                        {fill(t.from, { name: m.senderName, role: m.senderRole === "organization" ? t.roleOrganization : t.roleIndividual })}
+                                      </strong>{" "}
+                                      · {formatDate(m.createdAt.toISOString().slice(0, 10), lang)}
+                                    </p>
+                                    <p className="detail-text">{m.body}</p>
+                                    <p className="page-note">{m.contact ? fill(t.contactShared, { contact: m.contact }) : t.noContact}</p>
+                                  </li>
+                                ))}
+                              </ul>
+                            </>
+                          )}
+                        </details>
                       ) : null}
                       {state !== "withdrawn" ? (
                         <div className="my-listing-actions">

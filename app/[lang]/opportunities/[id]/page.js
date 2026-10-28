@@ -7,6 +7,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
+import ContactForm from "@/components/contact/ContactForm";
+import { getCurrentUser } from "@/lib/roles";
 import { formatDate } from "@/lib/formatDate";
 import { localePath } from "@/lib/i18n/config";
 import { fill, getDictionary } from "@/lib/i18n/dictionaries";
@@ -71,6 +73,7 @@ async function Detail({ params }) {
 
   let row;
   let profile = null;
+  let current = null; // who is looking, for the contact box (not needed for anything else on this page)
   try {
     row = await prisma.opportunity.findFirst({ where: { id, ...PUBLIC_WHERE } });
     // The poster's name is looked up here, on the server, only for listings that people posted. The account id itself is
@@ -78,6 +81,7 @@ async function Detail({ params }) {
     if (row && row.source === "user-posted" && row.ownerUserId) {
       profile = await prisma.profile.findUnique({ where: { userId: row.ownerUserId } });
     }
+    if (row && row.applyMethodType === "platform" && row.status === "active") current = await getCurrentUser();
   } catch (error) {
     console.error("Detail page could not load the opportunity:", error?.name, error?.code);
     return (
@@ -171,6 +175,39 @@ async function Detail({ params }) {
                   </li>
                 ))}
               </ul>
+            </section>
+          ) : null}
+
+          {o.applyMethodType === "platform" && o.status === "active" ? (
+            <section aria-labelledby="contact-heading">
+              <h2 id="contact-heading">{dictionary.contact.heading}</h2>
+              {!current ? (
+                <p>
+                  <Link href={`${localePath(lang, "/auth/sign-in")}?next=${encodeURIComponent(localePath(lang, `/opportunities/${row.id}`))}`}>
+                    {dictionary.contact.signIn}
+                  </Link>
+                </p>
+              ) : !current.isVerified ? (
+                <p>
+                  {dictionary.contact.verify}{" "}
+                  <Link href={`${localePath(lang, "/auth/verify")}?email=${encodeURIComponent(current.user.email)}`}>{dictionary.contact.verifyLink}</Link>
+                </p>
+              ) : !current.profile ? (
+                <p>
+                  {dictionary.contact.needProfile} <Link href={localePath(lang, "/account")}>{dictionary.contact.profileLink}</Link>
+                </p>
+              ) : row.ownerUserId === current.user.id ? (
+                <p>{dictionary.contact.ownListing}</p>
+              ) : (
+                <>
+                  <p>{dictionary.contact.intro}</p>
+                  <ContactForm
+                    listingId={row.id}
+                    senderName={current.profile.role === "organization" ? current.profile.orgName || current.profile.displayName : current.profile.displayName}
+                    copy={dictionary.contact}
+                  />
+                </>
+              )}
             </section>
           ) : null}
 

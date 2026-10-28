@@ -124,6 +124,8 @@ model Opportunity {
 
   @@index([approvalStatus, status])
   @@index([ownerUserId])
+
+  messages ContactMessage[]
 }
 
 enum ProfileRole {
@@ -139,4 +141,22 @@ model Profile {
   displayName String
   orgName     String? // set when role is organization
   createdAt   DateTime    @default(now())
+}
+
+// A message a signed-in person sent to the poster of a listing that uses "contact through OpenRaiz". The sender's name and
+// kind of account are copied here when it is sent. `contact` is whatever the sender chose to share so the poster can reply
+// outside OpenRaiz (there is no email or in-app reply yet).
+model ContactMessage {
+  id            String      @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  senderUserId  String
+  senderName    String
+  senderRole    ProfileRole
+  contact       String?
+  body          String
+  createdAt     DateTime    @default(now())
+
+  @@index([opportunityId, createdAt])
+  @@index([senderUserId, createdAt])
 }
