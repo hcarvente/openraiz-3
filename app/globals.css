@@ -1071,3 +1071,90 @@ main:focus {
   padding-left: 1.25rem;
   line-height: 1.5;
 }
+
+/* ---------- My listings ---------- */
+.my-listings {
+  display: grid;
+  gap: 1rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.my-listing {
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border: 1px solid #e5ded2;
+  border-radius: 1rem;
+}
+
+.my-listing-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.my-listing h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.my-listing h2 a {
+  color: var(--color-primary);
+}
+
+.my-listing-meta {
+  margin: 0.25rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.my-listing-reason {
+  margin: 0.75rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: #fdf3ec;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.my-listing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.withdraw-confirm {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #e2b9a6;
+  border-radius: 8px;
+  background: #fdf3ec;
+}
+
+.withdraw-confirm p {
+  margin: 0 0 0.5rem;
+}
+
+.pill-state-live {
+  background: #e3f1e9;
+  color: #1f5a3a;
+}
+
+.pill-state-pending {
+  background: #fdf0d2;
+  color: #7a5200;
+}
+
+.pill-state-rejected {
+  background: #fbe3d8;
+  color: #8a3512;
+}
+
+.pill-state-filled,
+.pill-state-withdrawn {
+  background: #ece7dc;
+  color: var(--color-muted);
+}

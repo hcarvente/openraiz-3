@@ -76,6 +76,14 @@ async function AccountContent({ lang, searchParams }) {
         </p>
       ) : null}
 
+      {isVerified && profile ? (
+        <p>
+          <Link className="button button-secondary" href={localePath(lang, "/my-listings")}>
+            {t.myListings}
+          </Link>
+        </p>
+      ) : null}
+
       {isAdmin ? (
         <p>
           <Link className="button button-secondary" href="/admin/opportunities/new">

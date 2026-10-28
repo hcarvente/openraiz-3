@@ -7,14 +7,8 @@
 // The words come in as `copy` (the dictionary for the page's language, "post" group) because this file runs in the browser.
 import { useEffect, useRef, useState } from "react";
 import { allowsEventDate } from "@/lib/opportunityTaxonomy";
-import { parseSkillsText } from "@/lib/opportunityOptions";
+import { EMPTY_POST_VALUES, buildPostBody } from "@/lib/postFormValues";
 import { fill } from "@/lib/i18n/dictionaries";
-
-const EMPTY = {
-  type: "", title: "", description: "", paid: "no", payNote: "", eventDate: "", deadline: "", locationType: "remote",
-  city: "", state: "", how: "platform", applyValue: "", summary: "", requirements: "", category: "", skills: "",
-  commitment: "", relevance: "welcomed", guidelines: false,
-};
 
 function Field({ name, label, hint, error, wide, children }) {
   const hintId = `${name}-hint`;
@@ -63,9 +57,15 @@ function Radios({ legend, name, value, onChange, options, error }) {
   );
 }
 
-export default function PostForm({ lang, successPath, role, allowedTypes, displayName, copy, typeLabels, categoryLabels, relevanceLabels }) {
-  const [values, setValues] = useState({ ...EMPTY, type: allowedTypes.length === 1 ? allowedTypes[0] : "" });
-  const [textLang, setTextLang] = useState(lang);
+export default function PostForm({
+  lang, successPath, role, allowedTypes, displayName, copy, typeLabels, categoryLabels, relevanceLabels,
+  mode = "create", listingId, initialValues, initialLang, notice,
+}) {
+  const isEdit = mode === "edit";
+  const [values, setValues] = useState(
+    initialValues ?? { ...EMPTY_POST_VALUES, type: allowedTypes.length === 1 ? allowedTypes[0] : "" },
+  );
+  const [textLang, setTextLang] = useState(initialLang ?? lang);
   const [fieldErrors, setFieldErrors] = useState({}); // { fieldName: "message" }
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -83,29 +83,6 @@ export default function PostForm({ lang, successPath, role, allowedTypes, displa
   const showEventDate = allowsEventDate(values.type);
   const showDeadline = values.type !== "" && !showEventDate && values.type !== "resource";
 
-  // The short answers the server expects (lib/validatePost.js). Empty optional answers are left out.
-  function buildBody() {
-    const body = {
-      type: values.type, title: values.title, description: values.description, lang: textLang, paid: values.paid,
-      locationType: values.locationType, applyMethodType: values.how, relevance: values.relevance, guidelines: values.guidelines,
-    };
-    if (values.payNote.trim()) body.payNote = values.payNote;
-    if (showEventDate && values.eventDate) body.eventDate = values.eventDate;
-    if (showDeadline && values.deadline) body.deadline = values.deadline;
-    if (hasPlace) {
-      body.city = values.city;
-      body.state = values.state;
-    }
-    if (values.how !== "platform") body.applyMethodValue = values.applyValue;
-    if (values.summary.trim()) body.summary = values.summary;
-    if (values.requirements.trim()) body.requirements = values.requirements;
-    if (values.category) body.category = values.category;
-    if (values.commitment.trim()) body.commitment = values.commitment;
-    const skills = parseSkillsText(values.skills);
-    if (skills.length > 0) body.skills = skills;
-    return body;
-  }
-
   async function handleSubmit(event) {
     event.preventDefault();
     if (submitting) return;
@@ -114,12 +91,12 @@ export default function PostForm({ lang, successPath, role, allowedTypes, displa
     setFieldErrors({});
 
     try {
-      const response = await fetch("/api/posts", {
-        method: "POST",
+      const response = await fetch(isEdit ? `/api/posts/${encodeURIComponent(listingId)}` : "/api/posts", {
+        method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildBody()),
+        body: JSON.stringify(buildPostBody(values, textLang)),
       });
-      if (response.status === 201) {
+      if (response.status === (isEdit ? 200 : 201)) {
         // A full page load, so the account page reads fresh data. The button stays disabled while the browser navigates.
         window.location.assign(successPath);
         return;
@@ -144,6 +121,12 @@ export default function PostForm({ lang, successPath, role, allowedTypes, displa
 
   return (
     <form className="opportunity-form" onSubmit={handleSubmit} noValidate>
+      {notice ? (
+        <p className="form-notice" role="note">
+          {notice}
+        </p>
+      ) : null}
+
       {formError ? (
         <div className="form-summary" role="alert" tabIndex={-1} ref={summaryRef}>
           <p>{formError}</p>
@@ -306,7 +289,7 @@ export default function PostForm({ lang, successPath, role, allowedTypes, displa
 
       <div className="form-actions">
         <button className="button button-primary" type="submit" disabled={submitting}>
-          {submitting ? copy.submitting : copy.submit}
+          {submitting ? (isEdit ? copy.submittingEdit : copy.submitting) : isEdit ? copy.submitEdit : copy.submit}
         </button>
       </div>
     </form>

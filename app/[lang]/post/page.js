@@ -63,7 +63,7 @@ async function PostContent({ lang }) {
   return (
     <PostForm
       lang={lang}
-      successPath={`${localePath(lang, "/account")}?posted=1`}
+      successPath={`${localePath(lang, "/my-listings")}?posted=1`}
       role={role}
       allowedTypes={role === "organization" ? ORGANIZATION_TYPES : INDIVIDUAL_TYPES}
       displayName={role === "organization" ? current.profile.orgName || current.profile.displayName : current.profile.displayName}
