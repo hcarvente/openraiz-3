@@ -180,7 +180,10 @@ export default function InterviewCoach({ lang, role, copy }) {
             {fill(copy.counter, { count: text.length, max: MAX_ANSWER_CHARS })}
           </p>
         </div>
-        <div aria-live="polite">{error ? <p className="form-summary">{error}</p> : null}</div>
+        <div aria-live="polite">
+          {error ? <p className="form-summary">{error}</p> : null}
+          {busy ? <p className="field-hint">{copy.wait}</p> : null}
+        </div>
         <div className="coach-actions">
           {step > 1 ? (
             <button className="button" type="button" disabled={busy} onClick={() => setStep(step - 1)}>

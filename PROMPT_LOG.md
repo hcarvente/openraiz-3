@@ -3806,3 +3806,17 @@ Plan: `~/.claude/plans/pasted-content-id-cefb-openraiz-week-delegated-sunbeam.md
 - **User-verified:** nothing in this entry was seen by the user.
 - **Not verified:** the menu with a real finger or VoiceOver on a phone; the signed-in post form's new radio chips; the review queue; the Spanish list page with chips (axe only); widths between 390 and 899 px.
 - **Known limits:** the filter chips for "State" show the raw state name; an empty search still shows only the existing hint and Clear button (no suggested searches); the "Contact the poster" button appears only for on-platform listings.
+
+## Step 27 — Coach wait note, and demo preparation
+
+- **Date:** 2026-10-29
+- **Previous commit:** `78028f6` (layout fixes), pushed; live permission checker 63 of 63 and axe 0 violations on the live public pages.
+- **Decisions by the user:** "For my demo, I will need to show actual data, and then show a real change on the website, I will also need you to help me do a 4 minute presentation run down."
+- **Checked on the LIVE site (2 AI calls, which count toward today's live totals, plus read-only listing reads):** 10 approved listings, every one with an approved Spanish translation (the V1 sample data, no test data). Live Job-Fit in Spanish: 5.4 s, valid. Live Coach (English, for a listing): **30.8 s**, valid; `maxDuration = 60` is therefore working on Vercel (the default would have cut it off).
+- **Problem found: the Coach is erratic on Google's side.** The same request locally took 2.3 s, 18.5 s and 32.2 s (default), 2.5 s, 11.9 s and 19.5 s (`thinking_level: low`), 2.5 s, 2.9 s and 28.7 s (`minimal`). All were valid and almost no thinking tokens were used, so the delay is the provider, not thinking; no setting fixes it, and none was changed.
+- **What changed:** while the Coach is working it now says "Writing your coaching. This usually takes a few seconds and can take up to 30." (EN and ES `interview.wait`).
+- **Demo materials:** prepared and kept outside the repository, by the user's request (not part of the project and not for GitHub).
+- **Checks (Claude-verified):** `npm test` 158 of 158, lint passes.
+- **Spanish for review (unreviewed by the user):** `interview.wait`, and the Spanish tagline in the fallback patch.
+- **User-verified:** nothing in this entry was seen by the user.
+- **Not verified:** the Coach note in a browser; a full rehearsal of the demo; the signed-in individual account and the live approval flow (needs a verified individual account on the live site, which does not exist yet).
