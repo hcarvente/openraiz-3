@@ -36,7 +36,7 @@ test("both languages use the same {markers} in each text", () => {
 
 test("the Spanish is really Spanish where it should differ from English", () => {
   // Texts that are the same in both languages on purpose (the brand name).
-  const allowedSame = new Set(["detail.postedByOpenRaiz"]);
+  const allowedSame = new Set(["detail.postedByOpenRaiz", "fit.counter"]); // a brand name, and a number pattern
   const spanish = Object.fromEntries(leaves(es));
   for (const [key, value] of leaves(en)) {
     if (value === spanish[key] && !allowedSame.has(key)) assert.fail(`${key} is identical in both languages: ${value}`);

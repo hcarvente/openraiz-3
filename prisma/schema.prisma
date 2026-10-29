@@ -188,3 +188,14 @@ model ListingReport {
   @@index([reporterUserId, createdAt])
   @@index([resolvedAt])
 }
+
+// How many AI calls were made per day and per feature (job_fit, interview, translate), for the daily limits in lib/ai/limits.js.
+// Only counts are stored: never the text a visitor typed or anything the AI answered.
+model AiUsage {
+  id    String   @id @default(cuid())
+  day   DateTime @db.Date
+  route String
+  count Int      @default(0)
+
+  @@unique([day, route])
+}

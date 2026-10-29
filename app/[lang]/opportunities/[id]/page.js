@@ -9,6 +9,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import ContactForm from "@/components/contact/ContactForm";
 import ReportForm from "@/components/report/ReportForm";
+import JobFitExplainer from "@/components/fit/JobFitExplainer";
 import { getCurrentUser } from "@/lib/roles";
 import { formatDate } from "@/lib/formatDate";
 import { localePath } from "@/lib/i18n/config";
@@ -178,6 +179,11 @@ async function Detail({ params }) {
               </ul>
             </section>
           ) : null}
+
+          <section aria-labelledby="fit-heading" className="fit-section">
+            <h2 id="fit-heading">{dictionary.fit.heading}</h2>
+            <JobFitExplainer listingId={row.id} lang={lang} copy={dictionary.fit} />
+          </section>
 
           {o.applyMethodType === "platform" && o.status === "active" ? (
             <section aria-labelledby="contact-heading">

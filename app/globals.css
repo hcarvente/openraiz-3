@@ -1216,3 +1216,31 @@ main:focus {
   color: var(--color-muted);
   font-size: 0.95rem;
 }
+
+/* ---------- Job-Fit Explainer ---------- */
+.fit-section {
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid #e5ded2;
+  border-radius: 1rem;
+}
+
+.job-fit-results {
+  margin-top: 1rem;
+}
+
+.job-fit-results:focus {
+  outline: none;
+}
+
+.job-fit-results h3 {
+  margin: 1rem 0 0.35rem;
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+
+.job-fit-results ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.5;
+}
