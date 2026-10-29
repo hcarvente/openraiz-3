@@ -9,7 +9,7 @@ const EMPTY = (initial) => ({
   title: initial?.title ?? "", summary: initial?.summary ?? "", description: initial?.description ?? "", requirements: initial?.requirements ?? "",
 });
 
-export default function ReviewPanel({ listingId, targetLanguage, initialTranslation, canApprove, queuePath }) {
+export default function ReviewPanel({ listingId, targetLanguage, initialTranslation, canApprove, canReject, queuePath }) {
   const [translation, setTranslation] = useState(EMPTY(initialTranslation));
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState("");
@@ -86,20 +86,26 @@ export default function ReviewPanel({ listingId, targetLanguage, initialTranslat
         </div>
       </section>
 
-      {canApprove ? (
+      {canApprove || canReject ? (
         <section className="form-section" aria-labelledby="decision-heading">
           <h2 id="decision-heading">Decision</h2>
           <div className="form-actions">
-            <button type="button" className="button button-primary" disabled={Boolean(busy)} onClick={() => send("approve", `${base}/approve`, "POST", { translation })}>
-              {busy === "approve" ? "Approving…" : "Approve and publish"}
-            </button>
-            {!rejecting ? (
+            {canApprove ? (
+              <button type="button" className="button button-primary" disabled={Boolean(busy)} onClick={() => send("approve", `${base}/approve`, "POST", { translation })}>
+                {busy === "approve" ? "Approving…" : "Approve and publish"}
+              </button>
+            ) : null}
+            {canReject && !rejecting ? (
               <button type="button" className="button button-danger" disabled={Boolean(busy)} onClick={() => setRejecting(true)}>
-                Reject…
+                {canApprove ? "Reject…" : "Take down…"}
               </button>
             ) : null}
           </div>
-          <p className="field-hint">If you filled in the translation, approving also saves it. Leave it empty to publish without one.</p>
+          {canApprove ? (
+            <p className="field-hint">If you filled in the translation, approving also saves it. Leave it empty to publish without one.</p>
+          ) : (
+            <p className="field-hint">This listing is public. Taking it down hides it and sends the reason to the poster.</p>
+          )}
 
           {rejecting ? (
             <div className="withdraw-confirm" role="group" aria-label="Reject this listing">

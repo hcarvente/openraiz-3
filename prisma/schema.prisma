@@ -126,6 +126,7 @@ model Opportunity {
   @@index([ownerUserId])
 
   messages ContactMessage[]
+  reports  ListingReport[]
 }
 
 enum ProfileRole {
@@ -159,4 +160,31 @@ model ContactMessage {
 
   @@index([opportunityId, createdAt])
   @@index([senderUserId, createdAt])
+}
+
+enum ReportReason {
+  scam_or_payment // asks for money, or looks like a scam
+  unsafe
+  misleading
+  discriminatory
+  spam
+  other
+}
+
+// A report from a signed-in person that a public listing worries them. The admin reads it at /admin/reports and marks it
+// handled (`resolvedAt`). The reporter's name is copied here when it is sent.
+model ListingReport {
+  id             String       @id @default(cuid())
+  opportunityId  String
+  opportunity    Opportunity  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  reporterUserId String
+  reporterName   String
+  reason         ReportReason
+  note           String?
+  createdAt      DateTime     @default(now())
+  resolvedAt     DateTime?
+
+  @@index([opportunityId, createdAt])
+  @@index([reporterUserId, createdAt])
+  @@index([resolvedAt])
 }

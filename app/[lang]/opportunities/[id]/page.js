@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import ContactForm from "@/components/contact/ContactForm";
+import ReportForm from "@/components/report/ReportForm";
 import { getCurrentUser } from "@/lib/roles";
 import { formatDate } from "@/lib/formatDate";
 import { localePath } from "@/lib/i18n/config";
@@ -81,7 +82,7 @@ async function Detail({ params }) {
     if (row && row.source === "user-posted" && row.ownerUserId) {
       profile = await prisma.profile.findUnique({ where: { userId: row.ownerUserId } });
     }
-    if (row && row.applyMethodType === "platform" && row.status === "active") current = await getCurrentUser();
+    if (row) current = await getCurrentUser();
   } catch (error) {
     console.error("Detail page could not load the opportunity:", error?.name, error?.code);
     return (
@@ -210,6 +211,33 @@ async function Detail({ params }) {
               )}
             </section>
           ) : null}
+
+          <section aria-labelledby="report-heading" className="report-section">
+            <details>
+              <summary id="report-heading">{dictionary.report.heading}</summary>
+              {!current ? (
+                <p>
+                  <Link href={`${localePath(lang, "/auth/sign-in")}?next=${encodeURIComponent(localePath(lang, `/opportunities/${row.id}`))}`}>
+                    {dictionary.report.signIn}
+                  </Link>
+                </p>
+              ) : !current.isVerified ? (
+                <p>
+                  {dictionary.report.verify}{" "}
+                  <Link href={`${localePath(lang, "/auth/verify")}?email=${encodeURIComponent(current.user.email)}`}>{dictionary.report.verifyLink}</Link>
+                </p>
+              ) : !current.profile ? (
+                <p>
+                  {dictionary.report.needProfile} <Link href={localePath(lang, "/account")}>{dictionary.report.profileLink}</Link>
+                </p>
+              ) : row.ownerUserId === current.user.id ? null : (
+                <>
+                  <p>{dictionary.report.intro}</p>
+                  <ReportForm listingId={row.id} copy={dictionary.report} />
+                </>
+              )}
+            </details>
+          </section>
 
           <section aria-labelledby="lived">
             <h2 id="lived">{d.livedHeading}</h2>

@@ -20,10 +20,12 @@ async function AccountContent({ lang, searchParams }) {
   const { posted } = await searchParams;
   let current;
   let queueCount = 0;
+  let reportCount = 0;
   try {
     current = await getCurrentUser();
     if (current?.isAdmin) {
       queueCount = await prisma.opportunity.count({ where: { approvalStatus: "pending", status: { not: "archived" } } });
+      reportCount = await prisma.listingReport.count({ where: { resolvedAt: null } });
     }
   } catch (error) {
     console.error("Account page could not load:", error?.name, error?.code);
@@ -93,6 +95,9 @@ async function AccountContent({ lang, searchParams }) {
         <p>
           <Link className="button button-primary" href="/admin/queue">
             Review queue ({queueCount})
+          </Link>{" "}
+          <Link className="button button-secondary" href="/admin/reports">
+            Reports ({reportCount})
           </Link>{" "}
           <Link className="button button-secondary" href="/admin/opportunities/new">
             {t.addOpportunity}

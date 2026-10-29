@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import AdminGate from "@/components/AdminGate";
 import ReviewPanel from "@/components/admin/ReviewPanel";
+import ResolveReportButton from "@/components/admin/ResolveReportButton";
 import { formatDate } from "@/lib/formatDate";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { isValidListingId } from "@/lib/opportunityDetail";
@@ -12,6 +13,7 @@ import { prisma } from "@/lib/prisma";
 export const metadata = { title: "Review listing | OpenRaiz" };
 
 const LANGUAGE_NAMES = { en: "English", es: "Spanish" };
+const REPORT_LABELS = getDictionary("en").report.reasons;
 
 function Row({ label, children }) {
   return (
@@ -34,10 +36,12 @@ async function Review({ params }) {
 
   let row = null;
   let poster = null;
+  let reports = [];
   try {
     if (isValidListingId(id)) {
       row = await prisma.opportunity.findUnique({ where: { id } });
       if (row?.ownerUserId) poster = await prisma.profile.findUnique({ where: { userId: row.ownerUserId } });
+      if (row) reports = await prisma.listingReport.findMany({ where: { opportunityId: id, resolvedAt: null }, orderBy: { createdAt: "asc" } });
     }
   } catch (error) {
     console.error("Review page could not load:", error?.name, error?.code);
@@ -69,6 +73,24 @@ async function Review({ params }) {
       <p className="page-intro">
         {row.approvalStatus === "pending" ? "Waiting for review" : `Already ${row.approvalStatus}`} · written in {LANGUAGE_NAMES[original]}
       </p>
+
+      {reports.length > 0 ? (
+        <section className="form-section" aria-labelledby="open-reports">
+          <h2 id="open-reports">Open reports ({reports.length})</h2>
+          <ul className="inbox-list">
+            {reports.map((report) => (
+              <li key={report.id}>
+                <p className="inbox-from">
+                  <strong>{REPORT_LABELS[report.reason] ?? report.reason}</strong> · reported by {report.reporterName} ·{" "}
+                  {formatDate(report.createdAt.toISOString().slice(0, 10), "en")}
+                </p>
+                {report.note ? <p className="detail-text">{report.note}</p> : null}
+                <ResolveReportButton reportId={report.id} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="form-section" aria-labelledby="checklist">
         <h2 id="checklist">Check before approving</h2>
@@ -112,6 +134,7 @@ async function Review({ params }) {
         targetLanguage={LANGUAGE_NAMES[target]}
         queuePath="/admin/queue"
         canApprove={row.approvalStatus === "pending" && row.status !== "archived"}
+        canReject={(row.approvalStatus === "pending" || row.approvalStatus === "approved") && row.status !== "archived"}
         initialTranslation={
           row.translationStatus === "approved"
             ? { title: row.titleTr, summary: row.summaryTr, description: row.descriptionTr, requirements: row.requirementsTr }

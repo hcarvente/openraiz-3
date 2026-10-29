@@ -52,13 +52,18 @@ test("approving with a translation saves the translation as approved in the same
   assert.equal(half.updates.length, 0);
 });
 
-test("only a listing waiting for review can be approved or rejected", async () => {
+test("only a listing waiting for review can be approved; a pending or approved one can be rejected", async () => {
   for (const approvalStatus of ["approved", "rejected"]) {
     const d = deps(listing({ approvalStatus }));
     assert.equal((await approveListing({ id: "abc", ...d })).status, 409, approvalStatus);
-    assert.equal((await rejectListing({ id: "abc", reason: "No", ...d })).status, 409, approvalStatus);
     assert.equal(d.updates.length, 0);
   }
+  const rejected = deps(listing({ approvalStatus: "rejected" }));
+  assert.equal((await rejectListing({ id: "abc", reason: "No", ...rejected })).status, 409); // already rejected
+  assert.equal(rejected.updates.length, 0);
+  const takeDown = deps(listing({ approvalStatus: "approved" }));
+  assert.equal((await rejectListing({ id: "abc", reason: "Reported as a scam.", ...takeDown })).status, 200); // taken down
+  assert.deepEqual(takeDown.updates[0].data, { approvalStatus: "rejected", rejectionReason: "Reported as a scam." });
   const withdrawn = deps(listing({ status: "archived" }));
   assert.equal((await approveListing({ id: "abc", ...withdrawn })).status, 404);
   assert.equal((await approveListing({ id: "missing", ...deps(listing()) })).status, 404);

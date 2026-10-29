@@ -1203,3 +1203,16 @@ main:focus {
 .inbox-from {
   margin: 0 0 0.4rem;
 }
+
+/* ---------- Report this listing ---------- */
+.report-section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5ded2;
+}
+
+.report-section summary {
+  cursor: pointer;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
