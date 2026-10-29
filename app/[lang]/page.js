@@ -17,7 +17,7 @@ export default async function LandingPage({ params }) {
       <main id="main-content" tabIndex={-1} className="about">
         <section className="hero-card" aria-labelledby="hero-heading">
           <h1 id="hero-heading">{t.heading}</h1>
-          <p className="hero-tagline">{t.tagline}</p>
+          <p className="hero-tagline">{t.summary}</p>
           <form className="hero-search" method="get" action={localePath(lang, "/opportunities")} role="search" aria-label={t.searchLabel}>
             <label className="visually-hidden" htmlFor="hero-q">
               {t.searchLabel}
@@ -27,6 +27,7 @@ export default async function LandingPage({ params }) {
               {t.searchButton}
             </button>
           </form>
+          <p className="hero-reassure">{t.reassure}</p>
         </section>
 
         <section className="tiles-card" aria-labelledby="browse-heading">

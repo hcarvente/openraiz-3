@@ -3842,3 +3842,15 @@ Plan: `~/.claude/plans/pasted-content-id-cefb-openraiz-week-delegated-sunbeam.md
 - **Spanish for review (unreviewed by the user):** "Hola, {name}", "¿Qué quieres hacer?", "Comparte una oportunidad con jóvenes.", "Mira el estado, edita o retira."
 - **User-verified:** nothing in this entry was seen by the user.
 - **Not verified:** **the real signed-in page** (the agent cannot sign in); the admin cards with real counts; the page with a very long name or organization name; whether the live account is an admin.
+
+## Step 30 — A short OpenRaiz summary at the top of the home page
+
+- **Date:** 2026-10-29
+- **Previous commit:** `428f77b` (friendlier Account tab), pushed; the live permission checker passed 63 of 63 and axe found 0 violations on the live public pages.
+- **Decisions by the user:** asked whether the OpenRaiz summary should be at the top of the first page; after the agent recommended a short version (not the four paragraphs), the user asked for a local preview, then: "Keep it, commit it, and update the demo change to match."
+- **What changed:** under the headline the hero now says what OpenRaiz is and who it is for ("OpenRaiz connects young adults whose lived experience with systems like justice, immigration, foster care or housing instability with organizations that see that experience as expertise."), replacing the short "Jobs, internships, fellowships..." line; the strongest trust line, "You never have to share your history to browse.", now sits right under the search box (it was the last paragraph of the page); the long "Why OpenRaiz exists" section is unchanged, below the tiles. The old `landing.tagline` text was deleted from both dictionaries (nothing used it). New EN/ES strings: `landing.summary`, `landing.reassure`.
+- **Demo change:** the live change shown in the presentation now edits this summary line (it names "people and organizations"), so the fallback patch, the runbook and its page were updated to match.
+- **Checks (Claude-verified):** `npm test` 158 of 158, lint passes; the preview was built and looked at in an English desktop screenshot; axe 0 violations on every public page.
+- **Spanish for review (unreviewed by the user):** the Spanish summary (built from the user's existing Spanish wording for the same idea) and "No tienes que contar nada de tu historia para explorar."
+- **User-verified:** the user saw the local preview in VS Code (they said "keep it").
+- **Not verified:** the Spanish home page visually; the phone layout of the new summary; the live site with this change (not yet pushed at the time of this entry).

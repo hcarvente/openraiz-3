@@ -2288,3 +2288,9 @@ input[type="checkbox"] {
   background: #fff;
   border: 1px solid #d9d0c0;
 }
+
+.hero-reassure {
+  margin: 0.75rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
