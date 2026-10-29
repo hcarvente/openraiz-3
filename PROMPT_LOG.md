@@ -3820,3 +3820,13 @@ Plan: `~/.claude/plans/pasted-content-id-cefb-openraiz-week-delegated-sunbeam.md
 - **Spanish for review (unreviewed by the user):** `interview.wait`, and the Spanish tagline in the fallback patch.
 - **User-verified:** nothing in this entry was seen by the user.
 - **Not verified:** the Coach note in a browser; a full rehearsal of the demo; the signed-in individual account and the live approval flow (needs a verified individual account on the live site, which does not exist yet).
+
+## Step 28 — Test data cleanup in the development database
+
+- **Date:** 2026-10-29
+- **Decisions by the user:** "yes, delete the 3 listings, delete [the two test accounts]" after being shown what would go (read-only look first).
+- **What was done (agent, development database `week7-dev` only; checked first that its host differs from the live one, and that neither account was an admin):** in one transaction that rolls back unless the counts match, deleted the 3 test listings by exact id ("TEST Taller", "Test Volunteer Role", "Test Taller CHANGED"), the 2 test profiles (individual and organization) and the 2 matching Neon Auth users (their sessions and accounts are removed by the database with them). The contact message and report attached to those listings went with them.
+- **Result (counted afterwards):** 10 listings remain, all the sample listings; 0 messages; 0 reports; 1 profile (the user's own admin account); 1 Neon Auth user. The live (Production) database was not touched; it already held only the 10 sample listings and the admin account.
+- **User-verified:** the deletion list and the two accounts were named by the user; the result was not looked at by the user.
+- **Not verified:** the development site in a browser after the cleanup; that no other copy of the two deleted accounts exists in Neon's own console views.
+- **Known limits:** 3 old sign-in sessions remain for the admin account (harmless); the AI use counters for the development database were not reset.
