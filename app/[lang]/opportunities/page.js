@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import OpportunityCard from "@/components/OpportunityCard";
+import FilterChips from "@/components/FilterChips";
 import DeletedNotice from "@/components/DeletedNotice";
 import { prisma } from "@/lib/prisma";
 import { serializePublicOpportunity } from "@/lib/serializeOpportunity";
@@ -141,6 +142,7 @@ async function OpportunitiesContent({ lang, searchParams }) {
   return (
     <>
       <SearchForm lang={lang} filters={filters} states={states} dictionary={dictionary} />
+      <FilterChips lang={lang} filters={filters} dictionary={dictionary} />
       {opportunities.some((o) => translatedView(o, lang).showNote) ? (
         <p className="page-note">{lang === "es" ? t.someOnlyEnglish : t.someOnlySpanish}</p>
       ) : null}

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import AuthLinks from "@/components/AuthLinks";
 import LanguageToggle from "@/components/LanguageToggle";
+import HeaderMenu from "@/components/HeaderMenu";
 import NavLinks from "@/components/NavLinks";
 import { localePath } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -37,7 +38,7 @@ export default function SiteHeader({ lang = "en", showLanguageToggle = true }) {
         </svg>
         OpenRaiz
       </Link>
-      <nav className="site-nav" aria-label={t.nav.label}>
+      <HeaderMenu label={t.nav.label} menuLabel={t.nav.menu}>
         <Suspense fallback={null}>
           <NavLinks labels={{ about: t.nav.about, opportunities: t.nav.opportunities, interview: t.nav.interview }} />
         </Suspense>
@@ -49,7 +50,7 @@ export default function SiteHeader({ lang = "en", showLanguageToggle = true }) {
             <LanguageToggle lang={lang} label={t.nav.otherLanguage} hint={t.nav.otherLanguageHint} />
           </Suspense>
         ) : null}
-      </nav>
+      </HeaderMenu>
       <div className="header-accent" aria-hidden="true" />
     </header>
   );

@@ -10,6 +10,7 @@
 // the admin routes and write APIs are locked to admins, and a signed-in admin view will turn it on later.
 import Link from "next/link";
 import DeleteOpportunityButton from "@/components/DeleteOpportunityButton";
+import TypeIcon from "@/components/TypeIcon";
 import { formatDate } from "@/lib/formatDate";
 import { localePath } from "@/lib/i18n/config";
 import { fill, getDictionary } from "@/lib/i18n/dictionaries";
@@ -34,14 +35,6 @@ function Icon({ size = 16, children }) {
   );
 }
 
-const BriefcaseShapes = (
-  <>
-    <rect x="3" y="7" width="18" height="13" rx="2" />
-    <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
-    <path d="M3 13h18" />
-  </>
-);
-
 export default function OpportunityCard({ opportunity, today, lang = "en", showAdminActions = false }) {
   const t = getDictionary(lang).card;
   const view = translatedView(opportunity, lang); // the original, or its approved translation
@@ -62,7 +55,7 @@ export default function OpportunityCard({ opportunity, today, lang = "en", showA
     <article className="opportunity-card">
       <div className="card-top">
         <span className="card-badge">
-          <Icon size={22}>{BriefcaseShapes}</Icon>
+          <TypeIcon type={opportunity.type} size={22} />
         </span>
         <div className="card-heading">
           <h2 className="card-title">
@@ -92,7 +85,7 @@ export default function OpportunityCard({ opportunity, today, lang = "en", showA
 
       <ul className="card-meta">
         <li className="meta-item">
-          <Icon>{BriefcaseShapes}</Icon>
+          <TypeIcon type={opportunity.type} />
           {typeLabel}
         </li>
         <li className="meta-item">

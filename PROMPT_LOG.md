@@ -3787,3 +3787,22 @@ Plan: `~/.claude/plans/pasted-content-id-cefb-openraiz-week-delegated-sunbeam.md
 - **User-verified:** nothing in this entry was seen by the user.
 - **Not verified:** **the real signed-in page** (the agent cannot sign in as admin): that `/admin` shows for the admin account and not for other accounts is covered by the same `AdminGate` as the other admin pages and by the signed-out check only; the Admin link in the header; the dashboard with pending listings and open reports (the development database had none, so the two lists were only seen empty); the 70% and 100% meter colors with real traffic (only unit-tested); the AI count shown is for UTC days.
 - **Known limits:** "Messages, last 7 days" counts all messages, not only unread ones (there is no read flag); the AI counts include calls that failed after starting; the dashboard is English only.
+
+## Step 26 — Five layout fixes
+
+- **Date:** 2026-10-29
+- **Previous commit:** `4f0bcb6` (admin dashboard), pushed; the live permission checker passed 63 of 63. The user said the Google Cloud budget alert has NOT been set up.
+- **Decisions by the user:** "yes, start with the five layout fixes" (from the layout review: phone header, per-type card icons, matching radios and checkboxes, filter chips, contact/apply button and flatter Job-Fit box).
+- **What changed:**
+  1. **Phone menu** (`components/HeaderMenu.js`): under 900 px the header is the logo plus a Menu button and the links open below it (about 250 px of header became about 70); choosing a link closes it; **without JavaScript the button is not drawn and the links stay visible**, so nothing is unreachable. `aria-expanded` and `aria-controls` are set. Desktop is unchanged.
+  2. **Type icons** (`components/TypeIcon.js`): each card now shows its own icon (job, internship, fellowship, volunteer, workshop, event, resource), shared with the home tiles.
+  3. **Radios and checkboxes:** brand green everywhere; choices in forms (sign-up role, the posting form) are chips that show which one is picked.
+  4. **Filter chips** (`components/FilterChips.js`): every filter in use appears above the results as a chip that is a plain link to the same search without it (works without JavaScript; "Remove filter: ..." as its accessible name).
+  5. **Detail page:** listings that use on-platform contact now have a "Contact the poster" button at the top that jumps to the contact form (listings with a web or email apply method already had their Apply button there); the Job-Fit form no longer sits in a card inside a card.
+  New EN/ES strings: `nav.menu`, `search.activeFilters`, `search.removeFilter`, `contact.jump`.
+- **Problems found:** the first menu version read the current address (`usePathname`) and the production build refused it (it needs a Suspense boundary, which would have left the navigation out of the prerendered page); it now closes when a link inside it is clicked instead. The first screenshot run failed only because the build had failed and no server was running.
+- **Checks (Claude-verified):** `npm test` 158 of 158, lint and build pass; axe **0 violations** on every public page, state, language and width including the filter-chip view and the open phone menu; skip link reaches the main area on all six pages; the menu was driven by script (collapsed by default, `aria-expanded` true after a click, closed after navigating, and the links visible with JavaScript off); permission checker 62 of 62 locally.
+- **Spanish for review (unreviewed by the user):** "Menú", "Filtros activos", "Quitar filtro: {filter}", "Contactar a quien publicó".
+- **User-verified:** nothing in this entry was seen by the user.
+- **Not verified:** the menu with a real finger or VoiceOver on a phone; the signed-in post form's new radio chips; the review queue; the Spanish list page with chips (axe only); widths between 390 and 899 px.
+- **Known limits:** the filter chips for "State" show the raw state name; an empty search still shows only the existing hint and Clear button (no suggested searches); the "Contact the poster" button appears only for on-platform listings.

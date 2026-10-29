@@ -145,6 +145,14 @@ async function Detail({ params }) {
             </p>
           ) : null}
 
+          {!apply && o.applyMethodType === "platform" && o.status === "active" ? (
+            <p>
+              <a className="button button-primary" href="#contact-heading">
+                {dictionary.contact.jump}
+              </a>
+            </p>
+          ) : null}
+
           {view.text.summary ? (
             <p className="detail-summary" lang={view.langs.summary}>
               {view.text.summary}
