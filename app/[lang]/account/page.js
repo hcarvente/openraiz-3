@@ -2,7 +2,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CompleteProfileForm } from "@/components/auth/AuthForms";
+import AccountView from "@/components/account/AccountView";
 import { getCurrentUser } from "@/lib/roles";
 import { prisma } from "@/lib/prisma";
 import { signOutAction } from "@/app/[lang]/auth/actions";
@@ -37,81 +37,21 @@ async function AccountContent({ lang, searchParams }) {
   }
   if (!current) redirect(`${localePath(lang, "/auth/sign-in")}?next=${encodeURIComponent(localePath(lang, "/account"))}`);
   const { user, profile, isVerified, isAdmin } = current;
-  const roleLabels = { individual: t.individual, organization: t.organization };
 
   return (
-    <>
-      {posted ? (
-        <p className="form-notice" role="status">
-          {getDictionary(lang).post.successBanner}
-        </p>
-      ) : null}
-      <dl className="account-details">
-        <dt>{t.name}</dt>
-        <dd>{profile?.displayName ?? user.name}</dd>
-        <dt>{t.email}</dt>
-        <dd>{user.email}</dd>
-        <dt>{t.emailStatus}</dt>
-        <dd>{isVerified ? t.verified : t.notVerified}</dd>
-        <dt>{t.accountType}</dt>
-        <dd>
-          {profile ? roleLabels[profile.role] : t.notSet}
-          {profile?.orgName ? ` — ${profile.orgName}` : ""}
-          {isAdmin ? ` · ${t.administrator}` : ""}
-        </dd>
-      </dl>
-
-      {!isVerified ? (
-        <p className="form-notice" role="status">
-          {t.verifyNotice}{" "}
-          <Link href={`${localePath(lang, "/auth/verify")}?email=${encodeURIComponent(user.email)}`}>{t.enterCode}</Link>
-        </p>
-      ) : null}
-
-      {!profile ? (
-        <section aria-labelledby="finish-profile">
-          <h2 id="finish-profile">{t.finishHeading}</h2>
-          <CompleteProfileForm copy={signUpCopy} saveLabel={t.save} savingLabel={t.saving} />
-        </section>
-      ) : null}
-
-      {isVerified && profile ? (
-        <p>
-          <Link className="button button-primary" href={localePath(lang, "/post")}>
-            {t.postOpportunity}
-          </Link>
-        </p>
-      ) : null}
-
-      {isVerified && profile ? (
-        <p>
-          <Link className="button button-secondary" href={localePath(lang, "/my-listings")}>
-            {t.myListings}
-          </Link>
-        </p>
-      ) : null}
-
-      {isAdmin ? (
-        <p>
-          <Link className="button button-primary" href="/admin/queue">
-            Review queue ({queueCount})
-          </Link>{" "}
-          <Link className="button button-secondary" href="/admin/reports">
-            Reports ({reportCount})
-          </Link>{" "}
-          <Link className="button button-secondary" href="/admin/opportunities/new">
-            {t.addOpportunity}
-          </Link>
-        </p>
-      ) : null}
-
-      <form action={signOutAction}>
-        <input type="hidden" name="lang" value={lang} />
-        <button className="button button-secondary" type="submit">
-          {t.signOut}
-        </button>
-      </form>
-    </>
+    <AccountView
+      lang={lang}
+      t={t}
+      signUpCopy={signUpCopy}
+      user={user}
+      profile={profile}
+      isVerified={isVerified}
+      isAdmin={isAdmin}
+      counts={{ pending: queueCount, reports: reportCount }}
+      posted={Boolean(posted)}
+      postedBanner={getDictionary(lang).post.successBanner}
+      signOutAction={signOutAction}
+    />
   );
 }
 
@@ -120,7 +60,7 @@ export default async function AccountPage({ params, searchParams }) {
   const t = getDictionary(lang).account;
   return (
     <>
-      <main id="main-content" tabIndex={-1} className="page-main auth-page">
+      <main id="main-content" tabIndex={-1} className="page-main account-page">
         <h1>{t.heading}</h1>
         <Suspense fallback={<p className="state-message">{t.loading}</p>}>
           <AccountContent lang={lang} searchParams={searchParams} />

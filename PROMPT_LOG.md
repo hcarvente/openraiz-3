@@ -3830,3 +3830,15 @@ Plan: `~/.claude/plans/pasted-content-id-cefb-openraiz-week-delegated-sunbeam.md
 - **User-verified:** the deletion list and the two accounts were named by the user; the result was not looked at by the user.
 - **Not verified:** the development site in a browser after the cleanup; that no other copy of the two deleted accounts exists in Neon's own console views.
 - **Known limits:** 3 old sign-in sessions remain for the admin account (harmless); the AI use counters for the development database were not reset.
+
+## Step 29 — Friendlier Account tab
+
+- **Date:** 2026-10-29
+- **Previous commit:** `ba21f7f` (cleanup log), pushed; the live permission checker passed 63 of 63.
+- **Decisions by the user:** asked whether the "Your account" tab should be more visually friendly (and who the users are now).
+- **Users, read-only (emails masked in the output):** development database 1 user (the user's own verified account, individual profile, on the admin list); live database 1 user (the user's own verified account, individual profile, created 2026-10-29). **Open question:** the live check printed "admin: false" because it read `ADMIN_EMAILS` from `.env.live`, which probably does not hold it; the real value is a Vercel variable that the agent cannot see, so whether the live account counts as admin is unverified.
+- **What changed:** the Account page was a plain list of labels and stacked buttons; it is now a profile card (initial in a circle, "Hi, name", email, badges for kind of account, email verified and administrator) followed by "What would you like to do?" action cards (Post an opportunity, My listings, each with a one-line hint) and, for admins, an Admin section (Dashboard, Review queue and Reports with counts, Add an opportunity); the sign-out button is smaller and last. Drawing moved into `components/account/AccountView.js` (no state); the page still works out who is signed in and passes it in. Same rules as before: unverified people see the verify notice and no action cards, people without a profile see the finish-profile form. New EN/ES strings: `account.welcome`, `actionsHeading`, `postHint`, `myListingsHint` (tú).
+- **Checks (Claude-verified):** `npm test` 158 of 158, lint and build pass; the signed-out check for `/en/account` and `/es/account` still passes (permission checker 62 of 62 locally); the layout was looked at in screenshots in three states (admin on desktop, organization in Spanish on a phone, unverified without a profile on a phone) using a **temporary page with made-up data** (deleted before this commit; the route answers 404), and axe found 0 violations and no sideways scroll in all three; axe still reports 0 on every public page.
+- **Spanish for review (unreviewed by the user):** "Hola, {name}", "¿Qué quieres hacer?", "Comparte una oportunidad con jóvenes.", "Mira el estado, edita o retira."
+- **User-verified:** nothing in this entry was seen by the user.
+- **Not verified:** **the real signed-in page** (the agent cannot sign in); the admin cards with real counts; the page with a very long name or organization name; whether the live account is an admin.

@@ -2139,3 +2139,152 @@ input[type="checkbox"] {
 .filter-chips a span {
   margin-left: 0.4rem;
 }
+
+/* ---------- Account page ---------- */
+.account-page {
+  width: 100%;
+  max-width: 46rem;
+}
+
+.account-page h2 {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  background: #fff;
+  border: 1px solid #e5ded2;
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: var(--color-primary);
+  border-radius: 50%;
+}
+
+.profile-main {
+  min-width: 0;
+}
+
+.account-page .profile-main h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.profile-email {
+  margin: 0.15rem 0 0.6rem;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.action-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  height: 100%;
+  padding: 1rem 2.5rem 1rem 1.1rem;
+  color: var(--color-text);
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid #e5ded2;
+  border-radius: 1rem;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.action-card.action-primary {
+  background: #eef6f1;
+  border-color: #b9d8c6;
+}
+
+.action-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-2px);
+}
+
+.action-card:focus-visible {
+  outline: 3px solid rgba(46, 111, 78, 0.55);
+  outline-offset: 2px;
+}
+
+.action-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.action-hint {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.action-arrow {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  transform: translateY(-50%);
+}
+
+.signout-form {
+  margin-top: 2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-card {
+    transition: none;
+  }
+
+  .action-card:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.badges .pill:not([class*="pill-state"]) {
+  background: #fff;
+  border: 1px solid #d9d0c0;
+}
