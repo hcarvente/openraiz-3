@@ -183,8 +183,10 @@ async function Detail({ params }) {
           <section aria-labelledby="fit-heading" className="fit-section">
             <h2 id="fit-heading">{dictionary.fit.heading}</h2>
             <JobFitExplainer listingId={row.id} lang={lang} copy={dictionary.fit} />
-            <p>
-              <Link href={`${localePath(lang, "/interview")}?opportunity=${row.id}`}>{dictionary.interview.practiceLink}</Link>
+            <p className="fit-practice">
+              <Link className="button button-secondary" href={`${localePath(lang, "/interview")}?opportunity=${row.id}`}>
+                {dictionary.interview.practiceLink}
+              </Link>
             </p>
           </section>
 

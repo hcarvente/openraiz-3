@@ -53,27 +53,35 @@ function SearchForm({ lang, filters, states, dictionary }) {
   const card = dictionary.card;
   return (
     <form className="search-form" method="get" action={localePath(lang, "/opportunities")} role="search" aria-label={s.formLabel}>
-      <div className="field search-field">
-        <label htmlFor="f-q">{s.search}</label>
-        <input id="f-q" name="q" type="search" defaultValue={filters.q} maxLength={100} placeholder={s.placeholder} autoComplete="off" />
+      <div className="search-row">
+        <div className="field search-field">
+          <label htmlFor="f-q">{s.search}</label>
+          <input id="f-q" name="q" type="search" defaultValue={filters.q} maxLength={100} placeholder={s.placeholder} autoComplete="off" />
+        </div>
+        <button className="button button-primary" type="submit">
+          {s.submit}
+        </button>
       </div>
       <div className="search-grid">
         <Select name="type" label={s.type} value={filters.type} allLabel={s.allTypes} options={OPPORTUNITY_TYPES.map((v) => [v, card.types[v]])} />
         <Select name="location" label={s.location} value={filters.location} allLabel={s.allLocations} options={LOCATION_VALUES.map((v) => [v, card.locations[v]])} />
         <Select name="paid" label={s.pay} value={filters.paid} allLabel={s.allPay} options={[["yes", s.paid], ["no", s.unpaid]]} />
-        <Select name="category" label={s.category} value={filters.category} allLabel={s.allCategories} options={CATEGORIES.map((v) => [v, dictionary.categories[v]])} />
-        <Select name="relevance" label={s.relevance} value={filters.relevance} allLabel={s.allRelevance} options={RELEVANCE_VALUES.map((v) => [v, card.relevance[v]])} />
-        <Select name="state" label={s.state} value={filters.state} allLabel={s.allStates} options={states.map((v) => [v, v])} />
-        <Select name="sort" label={s.sort} value={filters.sort} allLabel={s.sortNewest} options={[["deadline", s.sortDeadline]]} />
       </div>
+      {/* The less used filters wait behind this, but they are still part of the form, and it stays open when one is in use. */}
+      <details className="more-filters" open={Boolean(filters.category || filters.relevance || filters.state || filters.sort === "deadline")}>
+        <summary>{s.moreFilters}</summary>
+        <div className="search-grid">
+          <Select name="category" label={s.category} value={filters.category} allLabel={s.allCategories} options={CATEGORIES.map((v) => [v, dictionary.categories[v]])} />
+          <Select name="relevance" label={s.relevance} value={filters.relevance} allLabel={s.allRelevance} options={RELEVANCE_VALUES.map((v) => [v, card.relevance[v]])} />
+          <Select name="state" label={s.state} value={filters.state} allLabel={s.allStates} options={states.map((v) => [v, v])} />
+          <Select name="sort" label={s.sort} value={filters.sort} allLabel={s.sortNewest} options={[["deadline", s.sortDeadline]]} />
+        </div>
+      </details>
       <div className="search-actions">
         <label className="check-option">
           <input type="checkbox" name="open" value="1" defaultChecked={filters.open} />
           {s.openOnly}
         </label>
-        <button className="button button-primary" type="submit">
-          {s.submit}
-        </button>
         <Link className="button button-secondary" href={localePath(lang, "/opportunities")}>
           {s.clear}
         </Link>

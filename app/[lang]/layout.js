@@ -1,11 +1,15 @@
 // The root layout for the public site. The language comes from the address (/en/..., /es/...), so <html lang> is
 // right on every page and the pages can still be built ahead of time (generateStaticParams lists both languages).
 import "../globals.css";
+import { Fraunces } from "next/font/google";
 import { notFound } from "next/navigation";
 import SiteShell from "@/components/SiteShell";
 import { LOCALES, isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { siteMetadata } from "@/lib/siteMetadata";
+
+// The heading typeface. next/font downloads it at build time and serves it from this site (no request to Google by visitors).
+const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap" });
 
 // Same as the shared metadata, but with the description in the page's language.
 export async function generateMetadata({ params }) {
@@ -22,7 +26,7 @@ export default async function RootLayout({ children, params }) {
   if (!isLocale(lang)) notFound();
 
   return (
-    <html lang={lang}>
+    <html lang={lang} className={fraunces.variable}>
       <body>
         <SiteShell lang={lang}>{children}</SiteShell>
       </body>
