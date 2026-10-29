@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import AdminGate from "@/components/AdminGate";
+import AdminNav from "@/components/admin/AdminNav";
 import ResolveReportButton from "@/components/admin/ResolveReportButton";
 import { formatDate } from "@/lib/formatDate";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -31,6 +32,7 @@ async function Reports() {
 
   return (
     <>
+      <AdminNav />
       <h1>Reports</h1>
       <p className="page-intro">Listings that people reported, oldest first.</p>
       {reports.length === 0 ? (

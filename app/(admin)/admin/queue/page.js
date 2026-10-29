@@ -2,6 +2,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import AdminGate from "@/components/AdminGate";
+import AdminNav from "@/components/admin/AdminNav";
 import { formatDate } from "@/lib/formatDate";
 import { prisma } from "@/lib/prisma";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -30,6 +31,7 @@ async function Queue() {
 
   return (
     <>
+      <AdminNav />
       <h1>Review queue</h1>
       <p className="page-intro">Listings waiting for approval, oldest first. Nothing here is public yet.</p>
       {rows.length === 0 ? (

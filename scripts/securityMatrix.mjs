@@ -66,7 +66,7 @@ console.log("-- private pages, signed out: they must redirect to sign-in and sho
 // Words that only appear when real private content is shown. (The page titles "My listings" and "Mis anuncios" are plain
 // headings above the login check and are not private.)
 const hidden = ["Review queue (", "Approve and publish", "Open reports", "Withdraw", "Retirar", "Submitted ", "Enviado el", "Messages (", "Mensajes (", "Send for review", "Edit your listing"];
-for (const path of ["/admin/queue", "/admin/queue/x", "/admin/reports", "/admin/opportunities/new", "/en/account", "/es/account", "/en/my-listings", "/es/my-listings", "/en/post", "/es/post"]) {
+for (const path of ["/admin", "/admin/queue", "/admin/queue/x", "/admin/reports", "/admin/opportunities/new", "/en/account", "/es/account", "/en/my-listings", "/es/my-listings", "/en/post", "/es/post"]) {
   const r = await call("GET", path, { headers: path.startsWith("/es") ? { "Accept-Language": "es" } : {} });
   const body = r.text.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<template[\s\S]*?<\/template>/g, "").replace(/<title>[\s\S]*?<\/title>/g, "");
   const redirects = /NEXT_REDIRECT;replace;[^;]*sign-in/.test(r.text) || (r.status >= 300 && r.status < 400);
