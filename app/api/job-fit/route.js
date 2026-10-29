@@ -14,6 +14,9 @@ import { JOB_FIT_MAX_OUTPUT_TOKENS, JOB_FIT_MOCK_REPLY, JOB_FIT_SCHEMA, JOB_FIT_
 import { buildJobFitMessage, validateJobFitRequest } from "@/lib/jobFit/request";
 import { parseAndValidateJobFit } from "@/lib/jobFit/validateOutput";
 
+// The AI can take a while (a Spanish answer once took 28 s). Vercel stops a function at this many seconds.
+export const maxDuration = 60;
+
 const NO_STORE = { "Cache-Control": "no-store" };
 const respond = (body, status) => Response.json(body, { status, headers: NO_STORE });
 

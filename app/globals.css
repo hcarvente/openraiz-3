@@ -1244,3 +1244,62 @@ main:focus {
   padding-left: 1.25rem;
   line-height: 1.5;
 }
+
+/* ---------- Practice interview ---------- */
+.coach {
+  max-width: 44rem;
+}
+
+.coach h3 {
+  margin: 1.25rem 0 0.35rem;
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+
+.coach ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.5;
+}
+
+.coach-title:focus,
+.coach-question:focus,
+.coach legend:focus {
+  outline: none;
+}
+
+.coach-question {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.coach-progress {
+  margin: 0 0 0.75rem;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.field .coach-choice {
+  display: flex;
+  align-items: flex-start;
+  margin: 0 0 0.75rem;
+}
+
+.coach-choice .field-hint {
+  display: block;
+  margin: 0;
+}
+
+.coach-improved {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border-left: 4px solid var(--color-primary);
+  border-radius: 4px;
+}
+
+.coach-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}

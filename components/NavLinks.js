@@ -9,6 +9,7 @@ import { isLocale, localePath } from "@/lib/i18n/config";
 const ITEMS = [
   { path: "/", key: "about" },
   { path: "/opportunities", key: "opportunities" },
+  { path: "/interview", key: "interview" },
 ];
 
 export default function NavLinks({ labels }) {

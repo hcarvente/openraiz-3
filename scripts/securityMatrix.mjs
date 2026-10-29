@@ -50,10 +50,10 @@ const writes = [
 for (const [method, path] of writes) await expectStatus(`${method} ${path}`, method, path, 401, write());
 
 console.log("-- the same writes from another site must be refused with 403, even before the login is checked");
-for (const [method, path] of [...writes, ["POST", "/api/job-fit"]]) await expectStatus(`${method} ${path} (Origin: evil)`, method, path, 403, write(EVIL));
+for (const [method, path] of [...writes, ["POST", "/api/job-fit"], ["POST", "/api/interview/evaluate"]]) await expectStatus(`${method} ${path} (Origin: evil)`, method, path, 403, write(EVIL));
 
 console.log("-- wrong methods");
-for (const path of ["/api/posts", "/api/posts/x", "/api/listings/x/messages", "/api/listings/x/reports", "/api/admin/listings/x/approve", "/api/admin/listings/x/translate-draft", "/api/admin/reports/x/resolve", "/api/job-fit"]) {
+for (const path of ["/api/posts", "/api/posts/x", "/api/listings/x/messages", "/api/listings/x/reports", "/api/admin/listings/x/approve", "/api/admin/listings/x/translate-draft", "/api/admin/reports/x/resolve", "/api/job-fit", "/api/interview/evaluate"]) {
   await expectStatus(`GET ${path}`, "GET", path, 405);
 }
 
