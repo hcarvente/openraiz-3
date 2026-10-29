@@ -24,7 +24,13 @@ export default function InterviewCoach({ lang, role, copy }) {
   const text = answers[current] ?? "";
   const length = text.trim().length;
 
+  // Move the focus to the new question or the results, but not when the page first loads (that would steal it from the skip link).
+  const firstRender = useRef(true);
   useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
     if (headingRef.current) headingRef.current.focus();
   }, [step, result]);
 

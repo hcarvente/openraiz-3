@@ -39,7 +39,7 @@ export default function SiteHeader({ lang = "en", showLanguageToggle = true }) {
       </Link>
       <nav className="site-nav" aria-label={t.nav.label}>
         <Suspense fallback={null}>
-          <NavLinks labels={{ about: t.nav.about, opportunities: t.nav.opportunities }} />
+          <NavLinks labels={{ about: t.nav.about, opportunities: t.nav.opportunities, interview: t.nav.interview }} />
         </Suspense>
         <Suspense fallback={null}>
           <AuthLinks lang={lang} />

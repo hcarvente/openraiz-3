@@ -1303,3 +1303,26 @@ main:focus {
   gap: 0.75rem;
   flex-wrap: wrap;
 }
+
+.site-footer p + p {
+  margin-top: 0.4rem;
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.page-text {
+  max-width: 44rem;
+}
+
+.page-text h2 {
+  margin: 1.5rem 0 0.4rem;
+  font-size: 1.2rem;
+}
+
+.page-text ul {
+  padding-left: 1.25rem;
+  line-height: 1.55;
+}

@@ -103,3 +103,10 @@ test("links and markup are rejected everywhere, but a number the visitor gave is
   assert.equal(validateFeedback({ ...good, overall: "You mentioned two years of volunteering, which shows commitment." }).ok, true);
   assert.equal(validateFeedback({ ...good, overall: "Mencionaste dos años de voluntariado, lo que muestra compromiso." }).ok, true);
 });
+
+test("the navigation has a label for the Interview tab in both languages", async () => {
+  const { en } = await import("../lib/i18n/dictionaries/en.js");
+  const { es } = await import("../lib/i18n/dictionaries/es.js");
+  assert.equal(en.nav.interview, "Interview");
+  assert.equal(es.nav.interview, "Entrevista");
+});
