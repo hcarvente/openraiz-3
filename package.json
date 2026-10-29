@@ -15,8 +15,8 @@
   "dependencies": {
     "@google/genai": "2.31.0",
     "@neondatabase/auth": "0.7.0-beta",
-    "@prisma/adapter-pg": "7.10.0",
-    "@prisma/client": "7.10.0",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
     "dotenv": "18.0.8",
     "next": "16.4.1",
     "pg": "8.23.1",
@@ -26,6 +26,6 @@
   "devDependencies": {
     "eslint": "^9",
     "eslint-config-next": "16.4.1",
-    "prisma": "7.10.0"
+    "prisma": "7.10.1"
   }
 }

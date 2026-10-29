@@ -5,6 +5,7 @@
 // SECURITY: GET is public. POST is admin only (requireAdminApi: 401 if not signed in, 403 if not admin).
 import { prisma } from "@/lib/prisma";
 import { requireAdminApi } from "@/lib/roles";
+import { isSameOrigin } from "@/lib/sameOrigin";
 import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
 import { serializeOpportunity, serializePublicOpportunity } from "@/lib/serializeOpportunity";
 import { validateOpportunity } from "@/lib/validateOpportunity";
@@ -25,6 +26,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  if (!isSameOrigin(request.headers)) return Response.json({ error: "Request not allowed." }, { status: 403 });
   const { denied, current } = await requireAdminApi();
   if (denied) return denied;
 

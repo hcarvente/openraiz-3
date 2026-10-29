@@ -7,6 +7,7 @@
 // SECURITY: GET is public. PATCH and DELETE are admin only (requireAdminApi: 401 if not signed in, 403 if not admin).
 import { prisma } from "@/lib/prisma";
 import { requireAdminApi } from "@/lib/roles";
+import { isSameOrigin } from "@/lib/sameOrigin";
 import { PUBLIC_WHERE } from "@/lib/opportunityVisibility";
 import { serializeOpportunity, serializePublicOpportunity } from "@/lib/serializeOpportunity";
 import { validateOpportunityUpdate } from "@/lib/validateOpportunityUpdate";
@@ -42,6 +43,7 @@ export async function GET(_request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
+  if (!isSameOrigin(request.headers)) return Response.json({ error: "Request not allowed." }, { status: 403 });
   const { denied } = await requireAdminApi();
   if (denied) return denied;
 
@@ -86,7 +88,8 @@ export async function PATCH(request, { params }) {
   }
 }
 
-export async function DELETE(_request, { params }) {
+export async function DELETE(request, { params }) {
+  if (!isSameOrigin(request.headers)) return Response.json({ error: "Request not allowed." }, { status: 403 });
   const { denied } = await requireAdminApi();
   if (denied) return denied;
 
