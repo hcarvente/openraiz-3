@@ -3854,3 +3854,14 @@ Plan: `~/.claude/plans/pasted-content-id-cefb-openraiz-week-delegated-sunbeam.md
 - **Spanish for review (unreviewed by the user):** the Spanish summary (built from the user's existing Spanish wording for the same idea) and "No tienes que contar nada de tu historia para explorar."
 - **User-verified:** the user saw the local preview in VS Code (they said "keep it").
 - **Not verified:** the Spanish home page visually; the phone layout of the new summary; the live site with this change (not yet pushed at the time of this entry).
+
+## Step 31 — Cleanup commit
+
+- **Date:** 2026-10-29
+- **Previous commit:** `74f4027` (summary at the top of the home page), pushed; live permission checker 63 of 63, axe 0 violations on the live public pages.
+- **Decisions by the user:** "Do the cleanup commit and refresh the build chart."
+- **What changed:** deleted the 5 unused starter icons from `public/` (`file.svg`, `globe.svg`, `next.svg`, `vercel.svg`, `window.svg`; the build-time check found no reference in code, CSS, metadata or config, only in an earlier log entry that listed them as "not changed"); README brought up to date (158 tests instead of "150+", the admin dashboard, and the Account tab). The private build chart was refreshed separately (outside the repository).
+- **Checks (Claude-verified):** `npm test` 158 of 158, lint and build pass.
+- **User-verified:** nothing in this entry was seen by the user.
+- **Not verified:** the live site after this commit (not pushed at the time of this entry); that a favicon or social-sharing image does not depend on the deleted files (they use `favicon.svg`, `favicon-32.png`, `favicon-180.png` and `og-image.png`, which stay).
+- **Left as is on purpose:** the 1.6 MB mockup in `design-reference/`, the legacy admin API routes and pages (still used by "Add an opportunity"), the 10 Neon login SDK audit issues (no fix available), the log itself.

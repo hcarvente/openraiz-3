@@ -21,11 +21,12 @@ OpenRaiz 3.0 merges three earlier projects into one app:
 - **Practice an interview** (AI): three questions, kind and specific coaching, by category or for one listing.
 
 **Signed-in people with a verified email**
-- Create an account as an **individual** (workshops, events, resources) or an **organization** (all types).
+- Create an account as an **individual** (workshops, events, resources) or an **organization** (all types). The Account tab shows who you are and shortcuts to what you can do next.
 - Post a listing. It is held as **pending** until an admin approves it. Edit or withdraw your own listings.
 - Send a message to a listing's poster (the poster's email and phone are never shown) and report a listing.
 
 **Admins** (a verified email on the `ADMIN_EMAILS` list)
+- Use the **dashboard** (`/admin`): what is waiting, open reports, today's AI use against its limits, and the newest listings.
 - Review the approval queue: approve, or reject with a reason.
 - Review and edit the translation, optionally starting from an **AI draft**. The AI never publishes anything.
 - Handle reports, and manage every listing.
@@ -72,7 +73,7 @@ PROMPT_LOG.md   one honest entry per step: what was decided, built, verified and
 ## Test
 
 ```
-npm test        # 150+ unit tests, no database or network needed
+npm test        # 158 unit tests, no database or network needed
 npm run lint
 npm run build
 node scripts/securityMatrix.mjs http://localhost:3000   # permission checker (signed-out visitor)
