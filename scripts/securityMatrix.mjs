@@ -44,7 +44,7 @@ const writes = [
   ["POST", "/api/opportunities"], ["PATCH", `/api/opportunities/${id}`], ["DELETE", `/api/opportunities/${id}`],
   ["POST", "/api/posts"], ["PATCH", "/api/posts/x"], ["DELETE", "/api/posts/x"],
   ["POST", "/api/listings/x/messages"], ["POST", "/api/listings/x/reports"],
-  ["POST", "/api/admin/listings/x/approve"], ["POST", "/api/admin/listings/x/reject"], ["PUT", "/api/admin/listings/x/translation"],
+  ["POST", "/api/admin/listings/x/approve"], ["POST", "/api/admin/listings/x/reject"], ["PUT", "/api/admin/listings/x/translation"], ["POST", "/api/admin/listings/x/translate-draft"],
   ["POST", "/api/admin/reports/x/resolve"],
 ];
 for (const [method, path] of writes) await expectStatus(`${method} ${path}`, method, path, 401, write());
@@ -53,7 +53,7 @@ console.log("-- the same writes from another site must be refused with 403, even
 for (const [method, path] of [...writes, ["POST", "/api/job-fit"]]) await expectStatus(`${method} ${path} (Origin: evil)`, method, path, 403, write(EVIL));
 
 console.log("-- wrong methods");
-for (const path of ["/api/posts", "/api/posts/x", "/api/listings/x/messages", "/api/listings/x/reports", "/api/admin/listings/x/approve", "/api/admin/reports/x/resolve", "/api/job-fit"]) {
+for (const path of ["/api/posts", "/api/posts/x", "/api/listings/x/messages", "/api/listings/x/reports", "/api/admin/listings/x/approve", "/api/admin/listings/x/translate-draft", "/api/admin/reports/x/resolve", "/api/job-fit"]) {
   await expectStatus(`GET ${path}`, "GET", path, 405);
 }
 

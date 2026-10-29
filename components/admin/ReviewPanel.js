@@ -16,6 +16,7 @@ export default function ReviewPanel({ listingId, targetLanguage, initialTranslat
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState({});
   const [rejecting, setRejecting] = useState(false);
+  const [draftFilled, setDraftFilled] = useState(false);
 
   const set = (name, value) => setTranslation((current) => ({ ...current, [name]: value }));
   const base = `/api/admin/listings/${encodeURIComponent(listingId)}`;
@@ -49,6 +50,49 @@ export default function ReviewPanel({ listingId, targetLanguage, initialTranslat
     setBusy("");
   }
 
+  // Asks the AI for a DRAFT translation and puts it in the form below. Nothing is saved: the admin reads it, edits it, and then
+  // uses Save translation or Approve.
+  const DRAFT_ERRORS = {
+    aiDisabled: "AI is switched off right now.",
+    tooFast: "Please wait a moment and try again.",
+    dailyLimit: "Today's limit for translation drafts has been reached.",
+    RATE_LIMITED: "The AI is busy. Wait a little and try again.",
+    TIMEOUT: "That took too long. Please try again.",
+    NETWORK: "We couldn't reach the AI. Please try again.",
+    SERVER_CONFIG: "The AI isn't set up right now.",
+    AI_UNAVAILABLE: "The AI is having trouble right now. Please try again soon.",
+    INVALID_OUTPUT: "The AI's draft didn't pass our checks (for example it changed a number or added a link). Please try again.",
+  };
+
+  async function translateWithAi() {
+    if (busy) return;
+    const hasText = Object.values(translation).some((value) => value.trim() !== "");
+    if (hasText && !window.confirm("Replace what is in the translation form with an AI draft?")) return;
+    setBusy("draft");
+    setMessage("");
+    setErrors({});
+    setDraftFilled(false);
+    try {
+      const response = await fetch(`${base}/translate-draft`, { method: "POST" });
+      const data = await response.json().catch(() => null);
+      if (response.status === 200 && data?.result) {
+        setTranslation({
+          title: data.result.title ?? "",
+          summary: data.result.summary ?? "",
+          description: data.result.description ?? "",
+          requirements: data.result.requirements ?? "",
+        });
+        setDraftFilled(true);
+        setMessage("AI draft filled in below. Read it carefully and fix anything before you save or approve. Nothing is saved yet.");
+      } else {
+        setMessage(DRAFT_ERRORS[data?.error] ?? data?.error ?? "Something went wrong. Please try again.");
+      }
+    } catch {
+      setMessage("We couldn't reach the server. Please try again.");
+    }
+    setBusy("");
+  }
+
   const field = (name, label, rows, hint) => (
     <div className={`field${errors[name] ? " has-error" : ""}`}>
       <label htmlFor={`tr-${name}`}>{label}</label>
@@ -72,7 +116,8 @@ export default function ReviewPanel({ listingId, targetLanguage, initialTranslat
 
       <section className="form-section" aria-labelledby="translation-heading">
         <h2 id="translation-heading">Translation into {targetLanguage} (optional)</h2>
-        <p className="field-hint">Write it yourself. Title and description are both needed to save a translation; summary and requirements may be left empty.</p>
+        <p className="field-hint">Write it yourself, or use <strong>Translate with AI</strong> to get a draft. An AI draft is never published until you read it and save it. Title and description are both needed to save a translation; summary and requirements may be left empty.</p>
+        {draftFilled ? <p className="form-notice" role="note">This is an AI draft. Check names, numbers, dates and the tone before saving.</p> : null}
         <div className="form-grid">
           {field("title", "Title", 1)}
           {field("summary", "Short summary", 2)}
@@ -80,7 +125,10 @@ export default function ReviewPanel({ listingId, targetLanguage, initialTranslat
           {field("requirements", "Requirements", 3)}
         </div>
         <div className="form-actions">
-          <button type="button" className="button button-secondary" disabled={Boolean(busy)} onClick={() => send("save", `${base}/translation`, "PUT", { translation })}>
+          <button type="button" className="button button-secondary" disabled={Boolean(busy)} onClick={translateWithAi}>
+            {busy === "draft" ? "Translating…" : "Translate with AI"}
+          </button>
+          <button type="button" className="button button-primary" disabled={Boolean(busy)} onClick={() => send("save", `${base}/translation`, "PUT", { translation })}>
             {busy === "save" ? "Saving…" : "Save translation"}
           </button>
         </div>
