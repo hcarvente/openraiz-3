@@ -82,7 +82,9 @@ export async function resendCodeAction(_previous, formData) {
   const email = text(formData, "email").trim().toLowerCase();
   if (!email) return { message: messages.enterEmail, values: { email } };
   try {
-    await auth.emailOtp.sendVerificationOtp({ email });
+    // The login service needs to be told which kind of code this is ("email-verification"); without it, it refuses.
+    const { error } = await auth.emailOtp.sendVerificationOtp({ email, type: "email-verification" });
+    if (error) console.error("Resending the code was refused:", error.status ?? "", error.code ?? "", error.message ?? "");
   } catch (error) {
     console.error("Resending the code failed:", error?.name, error?.code);
   }
